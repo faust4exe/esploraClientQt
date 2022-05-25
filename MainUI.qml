@@ -45,12 +45,28 @@ Item {
                 id: searchTextField
                 Layout.fillWidth: true
                 placeholderText: qsTr("Block hash")
+                selectByMouse: true
             }
 
             Button {
                 id: searchButton
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
+                onClicked: {
+                    busyIndicator.visible = true
+                    textArea.title = qsTr("Block info")
+                    esploraFetcher.searchData(searchTextField.text)
+                }
+            }
+
+            Button {
+                id: transactionsButton
+                text: qsTr("Transactions")
+                onClicked: {
+                    busyIndicator.visible = true
+                    textArea.title = qsTr("Blocks transactions")
+                    esploraFetcher.getTransactions(searchTextField.text)
+                }
             }
         }
 
@@ -72,6 +88,7 @@ Item {
 
                 onClicked: {
                     busyIndicator.visible = true
+                    textArea.title = qsTr("Latest blocks")
                     esploraFetcher.fetchData()
                 }
             }
@@ -88,6 +105,11 @@ Item {
                 id: prevButton
                 text: qsTr("Previous")
                 Layout.minimumWidth: 100
+                onClicked: {
+                    busyIndicator.visible = true
+                    textArea.title = qsTr("Prev block")
+                    esploraFetcher.getPrevBlock()
+                }
             }
 
             Button {
@@ -100,11 +122,22 @@ Item {
 
         TextArea {
             id: textArea
-            x: 10
-            y: 68
-            width: 608
-            height: 340
+
+            property string title: ""
+            property string value: ""
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            wrapMode: Text.WrapAnywhere
+            anchors.rightMargin: 10
+            anchors.leftMargin: 10
+            anchors.bottomMargin: 60
+            anchors.topMargin: 68
+            textFormat: Text.AutoText
             placeholderText: qsTr("Text Area")
+            text: (title.length > 0 ? (title + ":\n") : "") + value
+            selectByMouse: true
         }
     }
 
@@ -112,14 +145,12 @@ Item {
         target: esploraFetcher
         function onDataReady(data) {
             busyIndicator.visible = false
-            textArea.text = data
+            textArea.value = data
+        }
+        function onSearchingBlock(hash) {
+            searchTextField.text = hash
         }
     }
-
 }
 
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}D{i:1}D{i:4}D{i:8}
-}
-##^##*/
+
