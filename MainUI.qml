@@ -70,7 +70,10 @@ Item {
                 text: qsTr("Load")
                 Layout.minimumWidth: 100
 
-                onClicked: busyIndicator.visible = true
+                onClicked: {
+                    busyIndicator.visible = true
+                    esploraFetcher.fetchData()
+                }
             }
 
             Item {
@@ -93,6 +96,23 @@ Item {
                 Layout.minimumWidth: 100
             }
 
+        }
+
+        TextArea {
+            id: textArea
+            x: 10
+            y: 68
+            width: 608
+            height: 340
+            placeholderText: qsTr("Text Area")
+        }
+    }
+
+    Connections {
+        target: esploraFetcher
+        function onDataReady(data) {
+            busyIndicator.visible = false
+            textArea.text = data
         }
     }
 
