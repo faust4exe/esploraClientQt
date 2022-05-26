@@ -11,6 +11,7 @@ const QString blockInfo("/block/:hash");
 const QString blockTxs("/block/:hash/txs[/:start_index]");
 const QString blocksList("/blocks[/:start_height]");
 const QString lastHash("/blocks/tip/hash");
+const QString blockAtHeight("/block-height/:height");
 
 EsploraFetcher::EsploraFetcher()
 {
@@ -64,10 +65,30 @@ void EsploraFetcher::getPrevBlock()
     }
 }
 
+void EsploraFetcher::getNextBlock()
+{
+    QJsonObject jsonObj = m_jsonDoc.object();
+    QJsonValue jsonValue = jsonObj.value("height");
+    if(!jsonValue.isNull()){
+        const int nextHeight = jsonValue.toInt() + 1;
+
+        QString theBlockAt = blockAtHeight;
+        theBlockAt.replace(":height", QString::number(nextHeight));
+        getRequest(baseUrl + theBlockAt, BlockAt);
+    }
+}
+
 void EsploraFetcher::onReplyFinished()
 {
     m_replyArray = m_reply->readAll();
     qDebug() << "Reply w data: \n" << m_replyArray;
+
+    if(m_requestType == BlockAt){
+        const QString hash = m_replyArray;
+        emit searchingBlock(hash);
+        searchData(hash);
+        return;
+    }
 
     QFuture<QJsonDocument> future =
             QtConcurrent::run(this, &EsploraFetcher::parseDocument, m_replyArray);
@@ -115,11 +136,12 @@ QJsonDocument EsploraFetcher::parseDocument(const QByteArray &array) const
     return jsonDoc;
 }
 
-void EsploraFetcher::getRequest(const QString &adress)
+void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 {
     QNetworkRequest request;
     request.setUrl(QUrl(adress));
 
+    m_requestType = type;
     m_reply = m_networkManager->get(request);
     connect(m_reply, &QIODevice::readyRead,
             this, &EsploraFetcher::onReplyFinished);

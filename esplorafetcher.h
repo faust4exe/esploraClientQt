@@ -14,6 +14,13 @@ class EsploraFetcher : public QObject
 {
     Q_OBJECT
 public:
+    enum RequestType {
+        Undefined,
+        BlocksList,
+        BlockInfo,
+        BlockAt
+    };
+
     EsploraFetcher();
     ~EsploraFetcher();
 
@@ -21,6 +28,7 @@ public:
     Q_INVOKABLE void searchData(const QString &hash = QString());
     Q_INVOKABLE void getTransactions(const QString &hash);
     Q_INVOKABLE void getPrevBlock();
+    Q_INVOKABLE void getNextBlock();
 
 signals:
     void dataReady(const QString &data);
@@ -37,12 +45,13 @@ private:
     QJsonDocument parseDocument(const QByteArray &array) const;
 
 private:
-    void getRequest(const QString &adress);
+    void getRequest(const QString &adress, RequestType type = Undefined);
 
 private:
     QNetworkAccessManager *m_networkManager;
     QFutureWatcher<QJsonDocument> m_futureWatcher;
     QNetworkReply *m_reply;
+    RequestType m_requestType;
     QByteArray m_replyArray;
     QJsonDocument m_jsonDoc;
 };

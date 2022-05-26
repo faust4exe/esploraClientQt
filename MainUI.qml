@@ -109,6 +109,11 @@ Item {
                 id: nextButton
                 text: qsTr("Next")
                 Layout.minimumWidth: 100
+                onClicked: {
+                    busyIndicator.visible = true
+                    textArea.title = qsTr("Next block")
+                    esploraFetcher.getNextBlock()
+                }
             }
 
         }
