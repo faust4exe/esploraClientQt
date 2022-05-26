@@ -14,7 +14,6 @@ class EsploraFetcher : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isFetching READ isFetching NOTIFY isFetchingChanged)
-
     Q_PROPERTY(QStringList blocksList READ blocksList NOTIFY blocksListChanged)
     Q_PROPERTY(QStringList transactionsList READ transactionsList NOTIFY transactionsListChanged)
 
@@ -39,9 +38,7 @@ public:
     Q_INVOKABLE void getNextBlock();
 
     const QStringList &blocksList() const;
-
     const QStringList &transactionsList() const;
-
     bool isFetching() const;
 
 signals:
@@ -50,9 +47,7 @@ signals:
     void searchingBlock(const QString &hash);
 
     void blocksListChanged();
-
     void transactionsListChanged();
-
     void isFetchingChanged();
 
 private slots:

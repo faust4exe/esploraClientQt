@@ -142,9 +142,13 @@ void EsploraFetcher::parseFinished()
         emit transactionDataReady(replyData);
     }
     else {
-        updateBlocksList();
-        replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
-        emit dataReady(replyData);
+        if(m_jsonDoc.isArray()) {
+            updateBlocksList();
+        }
+        else {
+            replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+            emit dataReady(replyData);
+        }
     }
 
     m_isFetching = false;

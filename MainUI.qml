@@ -56,7 +56,6 @@ Item {
                 id: transactionsButton
                 text: qsTr("Transactions")
                 onClicked: {
-                    blockInfoTextArea.title = qsTr("Blocks transactions")
                     esploraFetcher.getTransactions(searchTextField.text)
                 }
             }
@@ -79,7 +78,6 @@ Item {
                 Layout.minimumWidth: 100
 
                 onClicked: {
-                    blockInfoTextArea.title = qsTr("Latest blocks")
                     esploraFetcher.fetchData()
                 }
             }
@@ -124,17 +122,19 @@ Item {
                 id: blocksListView
                 width: 496
                 height: 355
+                Layout.maximumHeight: 300
+                clip: true
                 Layout.fillHeight: false
                 Layout.fillWidth: true
                 interactive: true
                 model: esploraFetcher.blocksList
 
                 delegate: Item {
-
+                    x: 6
                     width: textItem.width
                     height: 30
 
-                    Text {
+                    Label {
                         id: textItem
                         text: modelData
                         anchors.verticalCenter: parent.verticalCenter
@@ -145,6 +145,7 @@ Item {
                             color: "lightgray"
                             border.width: 1
                             border.color: "black"
+                            opacity: enabled ? 1.0 : 0.5
                             z: -1
 
                             MouseArea {
@@ -170,8 +171,6 @@ Item {
                 wrapMode: Text.WrapAnywhere
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                textFormat: Text.AutoText
-                placeholderText: qsTr("Text Area")
                 text: (title.length > 0 ? (title + ":\n") : "") + value
                 selectByMouse: true
             }
@@ -188,13 +187,16 @@ Item {
                 id: transactionsListView
                 width: 358
                 height: 404
+                Layout.maximumHeight: 300
+                clip: true
                 Layout.fillHeight: false
                 Layout.fillWidth: true
                 model: esploraFetcher.transactionsList
                 delegate: Item {
+                    x: 6
                     width: textItem1.width
                     height: 30
-                    Text {
+                    Label {
                         id: textItem1
                         text: modelData
                         anchors.verticalCenter: parent.verticalCenter
@@ -203,6 +205,7 @@ Item {
                             color: "#d3d3d3"
                             border.color: "#000000"
                             border.width: 1
+                            opacity: enabled ? 1.0 : 0.5
                             anchors.fill: parent
                             anchors.margins: -5
                             MouseArea {
@@ -230,7 +233,6 @@ Item {
                 wrapMode: Text.WrapAnywhere
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                placeholderText: qsTr("Text Area")
                 textFormat: Text.AutoText
                 selectByMouse: true
             }
