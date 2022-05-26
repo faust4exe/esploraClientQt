@@ -1,5 +1,7 @@
 #include "esplorafetcher.h"
 
+#include <QtConcurrent>
+#include <QFuture>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
@@ -19,6 +21,13 @@ EsploraFetcher::EsploraFetcher()
     m_networkManager = new QNetworkAccessManager(this);
     connect(m_networkManager, &QNetworkAccessManager::encrypted,
             this, &EsploraFetcher::onEncrypted);
+    connect(&m_futureWatcher, &QFutureWatcher<QJsonDocument>::finished,
+            this, &EsploraFetcher::parseFinished);
+}
+
+EsploraFetcher::~EsploraFetcher()
+{
+    m_futureWatcher.cancel();
 }
 
 void EsploraFetcher::fetchData()
@@ -57,21 +66,12 @@ void EsploraFetcher::getPrevBlock()
 
 void EsploraFetcher::onReplyFinished()
 {
-    QByteArray dataArray = m_reply->readAll();
-    QString replyData;
+    m_replyArray = m_reply->readAll();
+    qDebug() << "Reply w data: \n" << m_replyArray;
 
-    qDebug() << "Reply w data: \n" << dataArray;
-
-    m_jsonDoc = m_jsonDoc.fromJson(dataArray);
-    if(m_jsonDoc.isNull()){
-        replyData = dataArray;
-    }
-    else {
-        replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
-    }
-
-
-    emit dataReady(replyData);
+    QFuture<QJsonDocument> future =
+            QtConcurrent::run(this, &EsploraFetcher::parseDocument, m_replyArray);
+    m_futureWatcher.setFuture(future);
 }
 
 void EsploraFetcher::onErrorOccured()
@@ -91,6 +91,28 @@ void EsploraFetcher::onEncrypted(QNetworkReply *reply)
 {
     qDebug() << "Got Encrypted Reply : "
              << reply->readAll();
+}
+
+void EsploraFetcher::parseFinished()
+{
+    m_jsonDoc = m_futureWatcher.result();
+
+    QString replyData;
+    if(m_jsonDoc.isNull()){
+        replyData = m_replyArray;
+    }
+    else {
+        replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+    }
+
+    emit dataReady(replyData);
+}
+
+QJsonDocument EsploraFetcher::parseDocument(const QByteArray &array) const
+{
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(array);
+
+    return jsonDoc;
 }
 
 void EsploraFetcher::getRequest(const QString &adress)

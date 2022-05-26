@@ -14,13 +14,6 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    Timer {
-        id: loadTimer
-        interval: 5000
-        running: busyIndicator.visible
-        onTriggered: busyIndicator.visible = false
-    }
-
     Frame {
         id: mainFrame
         anchors.fill: parent
