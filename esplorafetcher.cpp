@@ -6,9 +6,11 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 
-const QString baseUrl("https://blockstream.info/api/");
+const QString baseUrl("https://blockstream.info/api");
 const QString blockInfo("/block/:hash");
 const QString blockTxs("/block/:hash/txs[/:start_index]");
+const QString blockTxIds("/block/:hash/txids");
+const QString transactionInfo("/tx/:txid");
 const QString blocksList("/blocks[/:start_height]");
 const QString lastHash("/blocks/tip/hash");
 const QString blockAtHeight("/block-height/:height");
@@ -48,10 +50,18 @@ void EsploraFetcher::searchData(const QString &hash)
 
 void EsploraFetcher::getTransactions(const QString &hash)
 {
-    QString theBlockTxs = blockTxs;
-    theBlockTxs.replace(":hash", hash);
-    theBlockTxs.replace("[/:start_index]", "");
-    getRequest(baseUrl + theBlockTxs);
+    QString theBlockTxIds = blockTxIds;
+
+    theBlockTxIds.replace(":hash", hash);
+    getRequest(baseUrl + theBlockTxIds, TransactionsList);
+}
+
+void EsploraFetcher::getTransactionInfo(const QString &hash, const QString &txId)
+{
+    QString theTxInfo = transactionInfo;
+
+    theTxInfo.replace(":txid", txId);
+    getRequest(baseUrl + theTxInfo, TransactionInfo);
 }
 
 void EsploraFetcher::getPrevBlock()
@@ -97,7 +107,8 @@ void EsploraFetcher::onReplyFinished()
 
 void EsploraFetcher::onErrorOccured()
 {
-
+    m_isFetching = false;
+    emit isFetchingChanged();
 }
 
 void EsploraFetcher::onSslError(const QList<QSslError> &errors)
@@ -121,12 +132,23 @@ void EsploraFetcher::parseFinished()
     QString replyData;
     if(m_jsonDoc.isNull()){
         replyData = m_replyArray;
+        emit dataReady(replyData);
+    }
+    else if(m_requestType == TransactionsList) {
+        updateTransactionsList();
+    }
+    else if(m_requestType == TransactionInfo) {
+        replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+        emit transactionDataReady(replyData);
     }
     else {
+        updateBlocksList();
         replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+        emit dataReady(replyData);
     }
 
-    emit dataReady(replyData);
+    m_isFetching = false;
+    emit isFetchingChanged();
 }
 
 QJsonDocument EsploraFetcher::parseDocument(const QByteArray &array) const
@@ -136,14 +158,48 @@ QJsonDocument EsploraFetcher::parseDocument(const QByteArray &array) const
     return jsonDoc;
 }
 
+void EsploraFetcher::updateBlocksList()
+{
+    if(!m_jsonDoc.isArray()){
+        return;
+    }
+
+    m_blocksList.clear();
+    QJsonArray blocksArray = m_jsonDoc.array();
+    foreach(const QJsonValue &blockItem, blocksArray) {
+        const QString blockId = blockItem.toObject().value("id").toString();
+        m_blocksList.append(blockId);
+    }
+    emit blocksListChanged();
+}
+
+void EsploraFetcher::updateTransactionsList()
+{
+    if(!m_jsonDoc.isArray()){
+        return;
+    }
+
+    m_transactionsList.clear();
+    QJsonArray transactionsArray = m_jsonDoc.array();
+    foreach(const QJsonValue &transactionsId, transactionsArray) {
+        const QString txId = transactionsId.toString();
+        m_transactionsList.append(txId);
+    }
+    emit transactionsListChanged();
+}
+
 void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 {
+    qDebug() << "Requesting " << adress;
     QNetworkRequest request;
     request.setUrl(QUrl(adress));
 
+    m_isFetching = true;
+    emit isFetchingChanged();
+
     m_requestType = type;
     m_reply = m_networkManager->get(request);
-    connect(m_reply, &QIODevice::readyRead,
+    connect(m_reply, &QNetworkReply::finished,
             this, &EsploraFetcher::onReplyFinished);
     connect(m_reply, &QNetworkReply::errorOccurred,
             this, &EsploraFetcher::onErrorOccured);
@@ -151,3 +207,18 @@ void EsploraFetcher::getRequest(const QString &adress, RequestType type)
             this, &EsploraFetcher::onSslError);
 }
 
+
+const QStringList &EsploraFetcher::blocksList() const
+{
+    return m_blocksList;
+}
+
+const QStringList &EsploraFetcher::transactionsList() const
+{
+    return m_transactionsList;
+}
+
+bool EsploraFetcher::isFetching() const
+{
+    return m_isFetching;
+}

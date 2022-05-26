@@ -4,12 +4,13 @@ import QtQuick.Layouts 1.11
 
 Item {
     id: item2
-    height: 480
-    width: 640
+
+    width: 1280
+    height: 768
 
     BusyIndicator {
         id: busyIndicator
-        visible: false
+        visible: esploraFetcher.isFetching
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
     }
@@ -46,8 +47,7 @@ Item {
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    busyIndicator.visible = true
-                    textArea.title = qsTr("Block info")
+                    blockInfoTextArea.title = qsTr("Block info")
                     esploraFetcher.searchData(searchTextField.text)
                 }
             }
@@ -56,8 +56,7 @@ Item {
                 id: transactionsButton
                 text: qsTr("Transactions")
                 onClicked: {
-                    busyIndicator.visible = true
-                    textArea.title = qsTr("Blocks transactions")
+                    blockInfoTextArea.title = qsTr("Blocks transactions")
                     esploraFetcher.getTransactions(searchTextField.text)
                 }
             }
@@ -80,8 +79,7 @@ Item {
                 Layout.minimumWidth: 100
 
                 onClicked: {
-                    busyIndicator.visible = true
-                    textArea.title = qsTr("Latest blocks")
+                    blockInfoTextArea.title = qsTr("Latest blocks")
                     esploraFetcher.fetchData()
                 }
             }
@@ -99,8 +97,7 @@ Item {
                 text: qsTr("Previous")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    busyIndicator.visible = true
-                    textArea.title = qsTr("Prev block")
+                    blockInfoTextArea.title = qsTr("Prev block")
                     esploraFetcher.getPrevBlock()
                 }
             }
@@ -110,41 +107,145 @@ Item {
                 text: qsTr("Next")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    busyIndicator.visible = true
-                    textArea.title = qsTr("Next block")
+                    blockInfoTextArea.title = qsTr("Next block")
                     esploraFetcher.getNextBlock()
                 }
             }
-
         }
 
-        TextArea {
-            id: textArea
+        ColumnLayout {
+            id: blocksInfoColumnLayout
+            x: 17
+            y: 62
+            width: 597
+            height: 640
 
-            property string title: ""
-            property string value: ""
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            wrapMode: Text.WrapAnywhere
-            anchors.rightMargin: 10
-            anchors.leftMargin: 10
-            anchors.bottomMargin: 60
-            anchors.topMargin: 68
-            textFormat: Text.AutoText
-            placeholderText: qsTr("Text Area")
-            text: (title.length > 0 ? (title + ":\n") : "") + value
-            selectByMouse: true
+            ListView {
+                id: blocksListView
+                width: 496
+                height: 355
+                Layout.fillHeight: false
+                Layout.fillWidth: true
+                interactive: true
+                model: esploraFetcher.blocksList
+
+                delegate: Item {
+
+                    width: textItem.width
+                    height: 30
+
+                    Text {
+                        id: textItem
+                        text: modelData
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: -5
+                            color: "lightgray"
+                            border.width: 1
+                            border.color: "black"
+                            z: -1
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onDoubleClicked: {
+                                    blockInfoTextArea.title = qsTr("Block info")
+                                    searchTextField.text = modelData
+                                    esploraFetcher.searchData(searchTextField.text)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            TextArea {
+                id: blockInfoTextArea
+
+                property string title: ""
+                property string value: ""
+                width: 606
+                height: 310
+                wrapMode: Text.WrapAnywhere
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                textFormat: Text.AutoText
+                placeholderText: qsTr("Text Area")
+                text: (title.length > 0 ? (title + ":\n") : "") + value
+                selectByMouse: true
+            }
+        }
+
+        ColumnLayout {
+            id: columnLayout
+            x: 620
+            y: 62
+            width: 638
+            height: 640
+
+            ListView {
+                id: transactionsListView
+                width: 358
+                height: 404
+                Layout.fillHeight: false
+                Layout.fillWidth: true
+                model: esploraFetcher.transactionsList
+                delegate: Item {
+                    width: textItem1.width
+                    height: 30
+                    Text {
+                        id: textItem1
+                        text: modelData
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Rectangle {
+                            color: "#d3d3d3"
+                            border.color: "#000000"
+                            border.width: 1
+                            anchors.fill: parent
+                            anchors.margins: -5
+                            MouseArea {
+                                anchors.fill: parent
+                                onDoubleClicked: {
+                                    txTextArea.title = qsTr("Transaction info")
+                                    esploraFetcher.getTransactionInfo(searchTextField.text, modelData)
+                                }
+                            }
+                            z: -1
+                        }
+                    }
+                }
+                interactive: true
+            }
+
+            TextArea {
+                id: txTextArea
+
+                property string title: ""
+                property string value: ""
+                width: 369
+                height: 576
+                text: (title.length > 0 ? (title + ":\n") : "") + value
+                wrapMode: Text.WrapAnywhere
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                placeholderText: qsTr("Text Area")
+                textFormat: Text.AutoText
+                selectByMouse: true
+            }
         }
     }
 
     Connections {
         target: esploraFetcher
         function onDataReady(data) {
-            busyIndicator.visible = false
-            textArea.value = data
+            blockInfoTextArea.value = data
         }
+        function onTransactionDataReady(data) {
+            txTextArea.value = data
+        }
+
         function onSearchingBlock(hash) {
             searchTextField.text = hash
         }
