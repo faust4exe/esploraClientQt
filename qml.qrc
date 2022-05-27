@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MainUI.qml</file>
+        <file>images/down.svg</file>
+        <file>images/next.svg</file>
+        <file>images/previous.svg</file>
+        <file>images/refresh.svg</file>
+        <file>images/up.svg</file>
     </qresource>
 </RCC>

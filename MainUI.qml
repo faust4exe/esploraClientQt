@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.11
 
 Item {
-    id: item
 
     width: 1280
     height: 768
@@ -22,11 +21,13 @@ Item {
         anchors.fill: parent
         anchors.margins: 5
         enabled: !busyIndicator.visible
+        spacing: 10
 
         RowLayout {
             id: searchLayout
 
-            height: 46
+            height: 30
+            Layout.fillWidth: true
 
             Label {
                 id: searchLabel
@@ -51,59 +52,14 @@ Item {
                     esploraFetcher.searchData(searchTextField.text)
                 }
             }
-
-            Button {
-                id: transactionsButton
-
-                text: qsTr("Transactions")
-                onClicked: {
-                    esploraFetcher.getTransactions(searchTextField.text)
-                }
-            }
-        }
-
-        RowLayout {
-            id: actionsLayout
-
-            height: 38
-
-            Button {
-                id: loadButton
-                text: qsTr("Load last 10 blocks")
-                Layout.minimumWidth: 100
-
-                onClicked: {
-                    esploraFetcher.fetchData()
-                }
-            }
-
-            Button {
-                id: prevButton
-                text: qsTr("Previous")
-                Layout.minimumWidth: 100
-                onClicked: {
-                    esploraFetcher.getPrevBlock()
-                }
-            }
-
-            Button {
-                id: nextButton
-                text: qsTr("Next")
-                Layout.minimumWidth: 100
-                onClicked: {
-                    esploraFetcher.getNextBlock()
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
         }
 
         SplitView {
             width: 1248
             height: 640
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             SplitView {
                 orientation: Qt.Vertical
@@ -111,10 +67,39 @@ Item {
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 550
 
+
                 GroupBox {
                     id: blocksGroupBox
 
                     title: qsTr("Blocks list")
+
+                    label: RowLayout {
+                        Label {
+                            Layout.leftMargin: 15
+                            text: blocksGroupBox.title
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/refresh.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Refresh")
+                            onClicked: esploraFetcher.fetchData()
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/up.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Newer")
+//                            onClicked: esploraFetcher.getPrevBlock()
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/down.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Older")
+//                            onClicked: esploraFetcher.getNextBlock()
+                        }
+                    }
 
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 350
@@ -124,11 +109,20 @@ Item {
 
                         anchors.fill: parent
 
+                        property int pressedIndex: -1
                         clip: true
                         interactive: true
                         model: esploraFetcher.blocksList
 
+                        Label {
+                            anchors.centerIn: parent
+                            opacity: 0.5
+                            text: qsTr("Press refresh to fetch fresh items")
+                            visible: blocksListView.count == 0
+                        }
+
                         delegate: Item {
+                            id: blRoot
                             x: 6
                             width: textItem.width
                             height: 30
@@ -141,7 +135,7 @@ Item {
                                 Rectangle {
                                     anchors.fill: parent
                                     anchors.margins: -5
-                                    color: "lightgray"
+                                    color: blocksListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
                                     border.width: 1
                                     border.color: "black"
                                     opacity: enabled ? 1.0 : 0.5
@@ -149,7 +143,8 @@ Item {
 
                                     MouseArea {
                                         anchors.fill: parent
-                                        onDoubleClicked: {
+                                        onClicked: {
+                                            blocksListView.pressedIndex = index
                                             searchTextField.text = modelData
                                             esploraFetcher.searchData(searchTextField.text)
                                         }
@@ -164,6 +159,29 @@ Item {
                     id: blockInfoGroupBox
 
                     title: qsTr("Block info")
+                    topPadding: 50
+
+                    label: RowLayout {
+                        height: 50
+                        Label {
+                            Layout.leftMargin: 15
+                            text: blockInfoGroupBox.title
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/previous.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Previous")
+                            onClicked: esploraFetcher.getPrevBlock()
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/next.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Next")
+                            onClicked: esploraFetcher.getNextBlock()
+                        }
+                    }
 
                     SplitView.minimumHeight: 50
                     SplitView.fillHeight: true
@@ -178,6 +196,13 @@ Item {
 
                             wrapMode: Text.WrapAnywhere
                             selectByMouse: true
+
+                            Label {
+                                anchors.centerIn: parent
+                                opacity: 0.5
+                                text: qsTr("Select a block in list to fetch block details")
+                                visible: blocksListView.count > 0 && blockInfoTextArea.text == ""
+                            }
                         }
                     }
                 }
@@ -194,18 +219,43 @@ Item {
 
                     title: qsTr("Transactions list")
 
+                    label: RowLayout {
+                        Label {
+                            Layout.leftMargin: 15
+                            text: transactionsListGroupBox.title
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/refresh.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Refresh")
+                            onClicked: esploraFetcher.getTransactions(searchTextField.text)
+                        }
+                    }
+
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 250
 
                     ListView {
                         id: transactionsListView
 
+                        property int pressedIndex: -1
                         anchors.fill: parent
                         clip: true
                         interactive: true
 
+                        Label {
+                            anchors.centerIn: parent
+                            opacity: 0.5
+                            text: qsTr("Press refresh to fetch block transactions")
+                            visible: blocksListView.count > 0
+                                     && searchTextField.text != ""
+                                     && transactionsListView.count == 0
+                        }
+
                         model: esploraFetcher.transactionsList
                         delegate: Item {
+                            id: txRoot
                             x: 6
                             width: textItem1.width
                             height: 30
@@ -215,7 +265,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Rectangle {
-                                    color: "#d3d3d3"
+                                    color: transactionsListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
                                     border.color: "#000000"
                                     border.width: 1
                                     opacity: enabled ? 1.0 : 0.5
@@ -223,7 +273,8 @@ Item {
                                     anchors.margins: -5
                                     MouseArea {
                                         anchors.fill: parent
-                                        onDoubleClicked: {
+                                        onClicked: {
+                                            transactionsListView.pressedIndex = index
                                             esploraFetcher.getTransactionInfo(searchTextField.text, modelData)
                                         }
                                     }
@@ -238,6 +289,29 @@ Item {
                     id: transactionInfoGroupBox
 
                     title: qsTr("Transaction Info")
+                    topPadding: 50
+
+                    label: RowLayout {
+                        height: 50
+                        Label {
+                            Layout.leftMargin: 15
+                            text: transactionInfoGroupBox.title
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/previous.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Previous")
+                            onClicked: transactionsListView.currentIndex--
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/next.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Next")
+                            onClicked: transactionsListView.currentIndex++
+                        }
+                    }
 
                     SplitView.minimumHeight: 50
                     SplitView.fillHeight: true
@@ -251,6 +325,13 @@ Item {
 
                             wrapMode: Text.WrapAnywhere
                             selectByMouse: true
+
+                            Label {
+                                anchors.centerIn: parent
+                                opacity: 0.5
+                                text: qsTr("Select a transaction in list to fetch its details")
+                                visible: txTextArea.text == "" && transactionsListView.count > 0
+                            }
                         }
                     }
                 }
