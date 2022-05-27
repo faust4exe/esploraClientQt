@@ -27,14 +27,14 @@ public:
         TransactionInfo
     };
 
-    EsploraFetcher();
+    EsploraFetcher(QObject *parent);
     ~EsploraFetcher();
 
     Q_INVOKABLE void fetchData();
     Q_INVOKABLE void fetchOlder();
     Q_INVOKABLE void fetchNewer();
     Q_INVOKABLE void searchData(const QString &hash = QString());
-    Q_INVOKABLE void getTransactions(const QString &hash);
+    Q_INVOKABLE void getTransactions(const QString &hash, const int height = 0);
     Q_INVOKABLE void getTransactionInfo(const QString &txId);
     Q_INVOKABLE void getPrevBlock();
     Q_INVOKABLE void getNextBlock();

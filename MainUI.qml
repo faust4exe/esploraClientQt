@@ -123,10 +123,12 @@ Item {
                             visible: blocksListView.count == 0
                         }
 
+                        ScrollBar.vertical: ScrollBar {}
+
                         delegate: Rectangle {
                             id: blRoot
 
-                            width: blocksListView.width
+                            width: blocksListView.width - 10
                             height: 25
 
                             color: blocksListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
@@ -239,6 +241,7 @@ Item {
                 GroupBox {
                     id: transactionsListGroupBox
 
+                    property int txShownIndex: 0
                     title: qsTr("Transactions list")
 
                     label: RowLayout {
@@ -251,7 +254,32 @@ Item {
                             icon.source: "images/refresh.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Refresh")
-                            onClicked: esploraFetcher.getTransactions(searchTextField.text)
+                            onClicked: {
+                                transactionsListGroupBox.txShownIndex = 0
+                                esploraFetcher.getTransactions(searchTextField.text)
+                            }
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/up.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Newer")
+                            onClicked: {
+                                transactionsListGroupBox.txShownIndex -= 25
+                                esploraFetcher.getTransactions(searchTextField.text,
+                                                               transactionsListGroupBox.txShownIndex)
+                            }
+                        }
+                        RoundButton {
+                            implicitHeight: 20
+                            icon.source: "images/down.svg"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Older")
+                            onClicked: {
+                                transactionsListGroupBox.txShownIndex += 25
+                                esploraFetcher.getTransactions(searchTextField.text,
+                                                               transactionsListGroupBox.txShownIndex)
+                            }
                         }
                     }
 
@@ -279,35 +307,35 @@ Item {
                                      && searchTextField.text != ""
                                      && transactionsListView.count == 0
                         }
+                        ScrollBar.vertical: ScrollBar {}
 
                         model: esploraFetcher.transactionsList
-                        delegate: Item {
+                        spacing: 5
+
+                        delegate: Rectangle {
                             id: txRoot
 
                             property string txId: modelData
 
-                            x: 6
-                            width: textItem1.width
-                            height: 30
+                            color: transactionsListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
+                            border.color: "#000000"
+                            border.width: 1
+                            opacity: enabled ? 1.0 : 0.5
+
+                            width: transactionsListView.width - 20
+                            height: 25
+
                             Label {
                                 id: textItem1
                                 text: modelData
                                 anchors.verticalCenter: parent.verticalCenter
+                                x: 5
+                            }
 
-                                Rectangle {
-                                    color: transactionsListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
-                                    border.color: "#000000"
-                                    border.width: 1
-                                    opacity: enabled ? 1.0 : 0.5
-                                    anchors.fill: parent
-                                    anchors.margins: -5
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            transactionsListView.pressedIndex = index
-                                        }
-                                    }
-                                    z: -1
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    transactionsListView.pressedIndex = index
                                 }
                             }
                         }

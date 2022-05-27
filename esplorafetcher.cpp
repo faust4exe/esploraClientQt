@@ -8,18 +8,19 @@
 
 const QString c_baseUrl("https://blockstream.info/api");
 const QString c_blockInfo("/block/:hash");
-const QString c_blockTxs("/block/:hash/txs[/:start_index]");
+const QString c_blockTxs("/block/:hash/txs/:start_index");
 const QString c_blockTxIds("/block/:hash/txids");
 const QString c_transactionInfo("/tx/:txid");
 const QString c_blocksList("/blocks/:start_height");
 const QString c_lastHash("/blocks/tip/hash");
 const QString c_blockAtHeight("/block-height/:height");
 
-EsploraFetcher::EsploraFetcher()
+EsploraFetcher::EsploraFetcher(QObject *parent)
+    : QObject(parent)
 {
-    qDebug() << QSslSocket::supportsSsl()
-             << QSslSocket::sslLibraryBuildVersionString()
-             << QSslSocket::sslLibraryVersionString();
+    qDebug() << " supportsSsl(): " << QSslSocket::supportsSsl()
+             << "\n sslLibraryBuildVersionString(): "  << QSslSocket::sslLibraryBuildVersionString()
+             << "\n slLibraryVersionString(): "<< QSslSocket::sslLibraryVersionString();
 
     m_networkManager = new QNetworkAccessManager(this);
     connect(m_networkManager, &QNetworkAccessManager::encrypted,
@@ -68,11 +69,18 @@ void EsploraFetcher::searchData(const QString &hash)
     getRequest(c_baseUrl + infoHash);
 }
 
-void EsploraFetcher::getTransactions(const QString &hash)
+void EsploraFetcher::getTransactions(const QString &hash, const int height)
 {
     QString theBlockTxIds = c_blockTxIds;
+    theBlockTxIds = c_blockTxs;
+
+    QString heightStr;
+    if(height > 0) {
+        heightStr = QString::number(height);
+    }
 
     theBlockTxIds.replace(":hash", hash);
+    theBlockTxIds.replace(":start_index", heightStr);
     getRequest(c_baseUrl + theBlockTxIds, TransactionsList);
 }
 
@@ -111,7 +119,7 @@ void EsploraFetcher::getNextBlock()
 void EsploraFetcher::onReplyFinished()
 {
     m_replyArray = m_reply->readAll();
-    qDebug() << "Reply w data: \n" << m_replyArray;
+//    qDebug() << "Reply w data: \n" << m_replyArray;
 
     if(m_requestType == BlockAt){
         const QString hash = m_replyArray;
@@ -218,7 +226,8 @@ void EsploraFetcher::updateTransactionsList()
     m_transactionsList.clear();
     QJsonArray transactionsArray = m_jsonDoc.array();
     foreach(const QJsonValue &transactionsId, transactionsArray) {
-        const QString txId = transactionsId.toString();
+        const QJsonObject object = transactionsId.toObject();
+        const QString txId = object.value("txid").toString();
         m_transactionsList.append(txId);
     }
     emit transactionsListChanged();
