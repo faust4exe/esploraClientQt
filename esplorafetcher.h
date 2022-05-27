@@ -31,6 +31,8 @@ public:
     ~EsploraFetcher();
 
     Q_INVOKABLE void fetchData();
+    Q_INVOKABLE void fetchOlder();
+    Q_INVOKABLE void fetchNewer();
     Q_INVOKABLE void searchData(const QString &hash = QString());
     Q_INVOKABLE void getTransactions(const QString &hash);
     Q_INVOKABLE void getTransactionInfo(const QString &hash, const QString &txId);
@@ -74,6 +76,7 @@ private:
     QByteArray m_replyArray;
     QJsonDocument m_jsonDoc;
 
+    int m_lowestBlockHeight = -1;
     QVariantList m_blocksList;
     QStringList m_transactionsList;
     bool m_isFetching = false;

@@ -90,14 +90,14 @@ Item {
                             icon.source: "images/up.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Newer")
-//                            onClicked: esploraFetcher.getPrevBlock()
+                            onClicked: esploraFetcher.fetchNewer()
                         }
                         RoundButton {
                             implicitHeight: 20
                             icon.source: "images/down.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Older")
-//                            onClicked: esploraFetcher.getNextBlock()
+                            onClicked: esploraFetcher.fetchOlder()
                         }
                     }
 
@@ -187,14 +187,20 @@ Item {
                             icon.source: "images/previous.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Previous")
-                            onClicked: esploraFetcher.getPrevBlock()
+                            onClicked: {
+                                blocksListView.pressedIndex++
+                                esploraFetcher.getPrevBlock()
+                            }
                         }
                         RoundButton {
                             implicitHeight: 20
                             icon.source: "images/next.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Next")
-                            onClicked: esploraFetcher.getNextBlock()
+                            onClicked: {
+                                blocksListView.pressedIndex--
+                                esploraFetcher.getNextBlock()
+                            }
                         }
                     }
 

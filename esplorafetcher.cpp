@@ -6,14 +6,14 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 
-const QString baseUrl("https://blockstream.info/api");
-const QString blockInfo("/block/:hash");
-const QString blockTxs("/block/:hash/txs[/:start_index]");
-const QString blockTxIds("/block/:hash/txids");
-const QString transactionInfo("/tx/:txid");
-const QString blocksList("/blocks[/:start_height]");
-const QString lastHash("/blocks/tip/hash");
-const QString blockAtHeight("/block-height/:height");
+const QString c_baseUrl("https://blockstream.info/api");
+const QString c_blockInfo("/block/:hash");
+const QString c_blockTxs("/block/:hash/txs[/:start_index]");
+const QString c_blockTxIds("/block/:hash/txids");
+const QString c_transactionInfo("/tx/:txid");
+const QString c_blocksList("/blocks/:start_height");
+const QString c_lastHash("/blocks/tip/hash");
+const QString c_blockAtHeight("/block-height/:height");
 
 EsploraFetcher::EsploraFetcher()
 {
@@ -38,29 +38,50 @@ void EsploraFetcher::fetchData()
     searchData();
 }
 
+void EsploraFetcher::fetchOlder()
+{
+    QString theBlocksList = c_blocksList;
+
+    theBlocksList.replace(":start_height",
+                          QString::number(m_lowestBlockHeight - 1));
+
+    getRequest(c_baseUrl + theBlocksList);
+}
+
+void EsploraFetcher::fetchNewer()
+{
+    QString theBlocksList = c_blocksList;
+
+    theBlocksList.replace(":start_height",
+                          QString::number(m_lowestBlockHeight + 19));
+
+    getRequest(c_baseUrl + theBlocksList);
+}
+
 void EsploraFetcher::searchData(const QString &hash)
 {
-    QString infoHash = blockInfo;
+    QString infoHash = c_blockInfo;
     if(hash.isEmpty()){
         infoHash.replace("block/","blocks");
     }
-    getRequest(baseUrl + infoHash.replace(":hash", hash));
+    infoHash.replace(":hash", hash);
+    getRequest(c_baseUrl + infoHash);
 }
 
 void EsploraFetcher::getTransactions(const QString &hash)
 {
-    QString theBlockTxIds = blockTxIds;
+    QString theBlockTxIds = c_blockTxIds;
 
     theBlockTxIds.replace(":hash", hash);
-    getRequest(baseUrl + theBlockTxIds, TransactionsList);
+    getRequest(c_baseUrl + theBlockTxIds, TransactionsList);
 }
 
 void EsploraFetcher::getTransactionInfo(const QString &hash, const QString &txId)
 {
-    QString theTxInfo = transactionInfo;
+    QString theTxInfo = c_transactionInfo;
 
     theTxInfo.replace(":txid", txId);
-    getRequest(baseUrl + theTxInfo, TransactionInfo);
+    getRequest(c_baseUrl + theTxInfo, TransactionInfo);
 }
 
 void EsploraFetcher::getPrevBlock()
@@ -81,9 +102,9 @@ void EsploraFetcher::getNextBlock()
     if(!jsonValue.isNull()){
         const int nextHeight = jsonValue.toInt() + 1;
 
-        QString theBlockAt = blockAtHeight;
+        QString theBlockAt = c_blockAtHeight;
         theBlockAt.replace(":height", QString::number(nextHeight));
-        getRequest(baseUrl + theBlockAt, BlockAt);
+        getRequest(c_baseUrl + theBlockAt, BlockAt);
     }
 }
 
@@ -183,6 +204,7 @@ void EsploraFetcher::updateBlocksList()
         blockData.insert("blockTimestamp",
                          timestamp.toString(Qt::SystemLocaleShortDate));
         m_blocksList.append(blockData);
+        m_lowestBlockHeight = height;
     }
     emit blocksListChanged();
 }
