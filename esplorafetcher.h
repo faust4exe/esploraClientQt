@@ -15,7 +15,7 @@ class EsploraFetcher : public QObject
     Q_OBJECT
     Q_PROPERTY(bool isFetching READ isFetching NOTIFY isFetchingChanged)
     Q_PROPERTY(QVariantList blocksList READ blocksList NOTIFY blocksListChanged)
-    Q_PROPERTY(QStringList transactionsList READ transactionsList NOTIFY transactionsListChanged)
+    Q_PROPERTY(QVariantList transactionsList READ transactionsList NOTIFY transactionsListChanged)
 
 public:
     enum RequestType {
@@ -40,7 +40,7 @@ public:
     Q_INVOKABLE void getNextBlock();
 
     const QVariantList &blocksList() const;
-    const QStringList &transactionsList() const;
+    const QVariantList &transactionsList() const;
     bool isFetching() const;
 
 signals:
@@ -78,7 +78,7 @@ private:
 
     int m_lowestBlockHeight = -1;
     QVariantList m_blocksList;
-    QStringList m_transactionsList;
+    QVariantList m_transactionsList;
     bool m_isFetching = false;
 };
 

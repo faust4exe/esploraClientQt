@@ -255,6 +255,7 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Refresh")
                             onClicked: {
+                                transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex = 0
                                 esploraFetcher.getTransactions(searchTextField.text)
                             }
@@ -265,6 +266,7 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Newer")
                             onClicked: {
+                                transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex -= 25
                                 esploraFetcher.getTransactions(searchTextField.text,
                                                                transactionsListGroupBox.txShownIndex)
@@ -276,6 +278,7 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Older")
                             onClicked: {
+                                transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex += 25
                                 esploraFetcher.getTransactions(searchTextField.text,
                                                                transactionsListGroupBox.txShownIndex)
@@ -291,6 +294,10 @@ Item {
 
                         property int pressedIndex: -1
                         onPressedIndexChanged: {
+                            if(pressedIndex === -1){
+                                return
+                            }
+
                             let itemTxId = transactionsListView.itemAtIndex(pressedIndex).txId
                             esploraFetcher.getTransactionInfo(itemTxId)
                         }
@@ -315,7 +322,7 @@ Item {
                         delegate: Rectangle {
                             id: txRoot
 
-                            property string txId: modelData
+                            property string txId: modelData.txId
 
                             color: transactionsListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
                             border.color: "#000000"
@@ -325,11 +332,20 @@ Item {
                             width: transactionsListView.width - 20
                             height: 25
 
-                            Label {
-                                id: textItem1
-                                text: modelData
-                                anchors.verticalCenter: parent.verticalCenter
-                                x: 5
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                Label {
+                                    id: textItem1
+                                    elide: Text.ElideLeft
+                                    text: modelData.txId
+                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.fillWidth: true
+                                }
+                                Label {
+                                    text: " fee:" + modelData.txFee
+                                    Layout.alignment: Qt.AlignVCenter
+                                }
                             }
 
                             MouseArea {

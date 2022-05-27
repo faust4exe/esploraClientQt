@@ -228,7 +228,12 @@ void EsploraFetcher::updateTransactionsList()
     foreach(const QJsonValue &transactionsId, transactionsArray) {
         const QJsonObject object = transactionsId.toObject();
         const QString txId = object.value("txid").toString();
-        m_transactionsList.append(txId);
+        const int fee = object.value("fee").toInt();
+
+        QVariantMap txData;
+        txData.insert("txId", txId);
+        txData.insert("txFee", fee);
+        m_transactionsList.append(txData);
     }
     emit transactionsListChanged();
 }
@@ -258,7 +263,7 @@ const QVariantList &EsploraFetcher::blocksList() const
     return m_blocksList;
 }
 
-const QStringList &EsploraFetcher::transactionsList() const
+const QVariantList &EsploraFetcher::transactionsList() const
 {
     return m_transactionsList;
 }
