@@ -113,6 +113,7 @@ Item {
                         clip: true
                         interactive: true
                         model: esploraFetcher.blocksList
+                        spacing: 5
 
                         Label {
                             anchors.centerIn: parent
@@ -121,34 +122,48 @@ Item {
                             visible: blocksListView.count == 0
                         }
 
-                        delegate: Item {
+                        delegate: Rectangle {
                             id: blRoot
-                            x: 6
-                            width: textItem.width
-                            height: 30
 
-                            Label {
-                                id: textItem
-                                text: modelData
-                                anchors.verticalCenter: parent.verticalCenter
+                            width: blocksListView.width
+                            height: 25
 
-                                Rectangle {
-                                    anchors.fill: parent
-                                    anchors.margins: -5
-                                    color: blocksListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
-                                    border.width: 1
-                                    border.color: "black"
-                                    opacity: enabled ? 1.0 : 0.5
-                                    z: -1
+                            color: blocksListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
+                            border.width: 1
+                            border.color: "black"
+                            opacity: enabled ? 1.0 : 0.5
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            blocksListView.pressedIndex = index
-                                            searchTextField.text = modelData
-                                            esploraFetcher.searchData(searchTextField.text)
-                                        }
-                                    }
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 5
+
+                                Label {
+                                    id: textItem
+                                    text: modelData.blockId
+
+                                    elide: Text.ElideLeft
+
+                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.fillWidth: true
+                                }
+
+                                Label {
+                                    text: " @" + modelData.blockHeight
+                                    Layout.alignment: Qt.AlignVCenter
+                                }
+
+                                Label {
+                                    text: " #" + modelData.blockTimestamp
+                                    Layout.alignment: Qt.AlignVCenter
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    blocksListView.pressedIndex = index
+                                    searchTextField.text = modelData.blockId
+                                    esploraFetcher.searchData(searchTextField.text)
                                 }
                             }
                         }

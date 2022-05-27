@@ -170,8 +170,19 @@ void EsploraFetcher::updateBlocksList()
     m_blocksList.clear();
     QJsonArray blocksArray = m_jsonDoc.array();
     foreach(const QJsonValue &blockItem, blocksArray) {
-        const QString blockId = blockItem.toObject().value("id").toString();
-        m_blocksList.append(blockId);
+        const QJsonObject object = blockItem.toObject();
+        const QString blockId = object.value("id").toString();
+        const int height = object.value("height").toInt();
+        const QDateTime timestamp =
+            QDateTime::fromSecsSinceEpoch(object.value("timestamp").toInt());
+
+
+        QVariantMap blockData;
+        blockData.insert("blockId", blockId);
+        blockData.insert("blockHeight", height);
+        blockData.insert("blockTimestamp",
+                         timestamp.toString(Qt::SystemLocaleShortDate));
+        m_blocksList.append(blockData);
     }
     emit blocksListChanged();
 }
@@ -211,7 +222,7 @@ void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 }
 
 
-const QStringList &EsploraFetcher::blocksList() const
+const QVariantList &EsploraFetcher::blocksList() const
 {
     return m_blocksList;
 }

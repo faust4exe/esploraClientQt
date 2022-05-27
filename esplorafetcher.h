@@ -14,7 +14,7 @@ class EsploraFetcher : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isFetching READ isFetching NOTIFY isFetchingChanged)
-    Q_PROPERTY(QStringList blocksList READ blocksList NOTIFY blocksListChanged)
+    Q_PROPERTY(QVariantList blocksList READ blocksList NOTIFY blocksListChanged)
     Q_PROPERTY(QStringList transactionsList READ transactionsList NOTIFY transactionsListChanged)
 
 public:
@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE void getPrevBlock();
     Q_INVOKABLE void getNextBlock();
 
-    const QStringList &blocksList() const;
+    const QVariantList &blocksList() const;
     const QStringList &transactionsList() const;
     bool isFetching() const;
 
@@ -74,7 +74,7 @@ private:
     QByteArray m_replyArray;
     QJsonDocument m_jsonDoc;
 
-    QStringList m_blocksList;
+    QVariantList m_blocksList;
     QStringList m_transactionsList;
     bool m_isFetching = false;
 };
