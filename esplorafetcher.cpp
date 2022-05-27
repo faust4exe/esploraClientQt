@@ -40,12 +40,11 @@ void EsploraFetcher::fetchData()
 
 void EsploraFetcher::searchData(const QString &hash)
 {
-    const QString hashTag(":hash");
     QString infoHash = blockInfo;
     if(hash.isEmpty()){
         infoHash.replace("block/","blocks");
     }
-    getRequest(baseUrl + infoHash.replace(hashTag, hash));
+    getRequest(baseUrl + infoHash.replace(":hash", hash));
 }
 
 void EsploraFetcher::getTransactions(const QString &hash)

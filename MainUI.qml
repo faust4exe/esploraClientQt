@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.11
 
 Item {
-    id: item2
+    id: item
 
     width: 1280
     height: 768
@@ -16,28 +16,27 @@ Item {
         z:1
     }
 
-    Frame {
+    ColumnLayout {
         id: mainFrame
+
         anchors.fill: parent
+        anchors.margins: 5
         enabled: !busyIndicator.visible
 
         RowLayout {
             id: searchLayout
+
             height: 46
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 10
-            anchors.leftMargin: 10
-            anchors.topMargin: 10
 
             Label {
                 id: searchLabel
+
                 text: qsTr("Search for")
             }
 
             TextField {
                 id: searchTextField
+
                 Layout.fillWidth: true
                 placeholderText: qsTr("Block hash")
                 selectByMouse: true
@@ -45,6 +44,7 @@ Item {
 
             Button {
                 id: searchButton
+
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
                 onClicked: {
@@ -54,6 +54,7 @@ Item {
 
             Button {
                 id: transactionsButton
+
                 text: qsTr("Transactions")
                 onClicked: {
                     esploraFetcher.getTransactions(searchTextField.text)
@@ -63,18 +64,12 @@ Item {
 
         RowLayout {
             id: actionsLayout
-            y: 424
+
             height: 38
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.rightMargin: 10
-            anchors.leftMargin: 10
-            anchors.bottomMargin: 10
 
             Button {
                 id: loadButton
-                text: qsTr("Load")
+                text: qsTr("Load last 10 blocks")
                 Layout.minimumWidth: 100
 
                 onClicked: {
@@ -101,17 +96,12 @@ Item {
             }
 
             Item {
-                id: item1
-                width: 200
-                height: 200
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
         }
 
         SplitView {
-            x: 10
-            y: 62
             width: 1248
             height: 640
 
@@ -194,11 +184,6 @@ Item {
             }
 
             SplitView {
-
-                x: 620
-                y: 62
-                width: 638
-                height: 640
                 orientation: Qt.Vertical
 
                 SplitView.minimumWidth: 50
