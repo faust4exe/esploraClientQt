@@ -48,7 +48,6 @@ Item {
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    blockInfoTextArea.title = qsTr("Block info")
                     esploraFetcher.searchData(searchTextField.text)
                 }
             }
@@ -88,7 +87,6 @@ Item {
                 text: qsTr("Previous")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    blockInfoTextArea.title = qsTr("Prev block")
                     esploraFetcher.getPrevBlock()
                 }
             }
@@ -98,7 +96,6 @@ Item {
                 text: qsTr("Next")
                 Layout.minimumWidth: 100
                 onClicked: {
-                    blockInfoTextArea.title = qsTr("Next block")
                     esploraFetcher.getNextBlock()
                 }
             }
@@ -119,52 +116,53 @@ Item {
             height: 640
 
             SplitView {
-                x: 17
-                y: 62
-                width: 539
-                height: 640
                 orientation: Qt.Vertical
 
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 550
 
-                ListView {
-                    id: blocksListView
-                    width: 496
-                    height: 355
-                    clip: true
+                GroupBox {
+                    id: blocksGroupBox
+
+                    title: qsTr("Blocks list")
 
                     SplitView.minimumHeight: 50
-                    SplitView.preferredHeight: 300
+                    SplitView.preferredHeight: 350
 
-                    interactive: true
-                    model: esploraFetcher.blocksList
+                    ListView {
+                        id: blocksListView
 
-                    delegate: Item {
-                        x: 6
-                        width: textItem.width
-                        height: 30
+                        anchors.fill: parent
 
-                        Label {
-                            id: textItem
-                            text: modelData
-                            anchors.verticalCenter: parent.verticalCenter
+                        clip: true
+                        interactive: true
+                        model: esploraFetcher.blocksList
 
-                            Rectangle {
-                                anchors.fill: parent
-                                anchors.margins: -5
-                                color: "lightgray"
-                                border.width: 1
-                                border.color: "black"
-                                opacity: enabled ? 1.0 : 0.5
-                                z: -1
+                        delegate: Item {
+                            x: 6
+                            width: textItem.width
+                            height: 30
 
-                                MouseArea {
+                            Label {
+                                id: textItem
+                                text: modelData
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Rectangle {
                                     anchors.fill: parent
-                                    onDoubleClicked: {
-                                        blockInfoTextArea.title = qsTr("Block info")
-                                        searchTextField.text = modelData
-                                        esploraFetcher.searchData(searchTextField.text)
+                                    anchors.margins: -5
+                                    color: "lightgray"
+                                    border.width: 1
+                                    border.color: "black"
+                                    opacity: enabled ? 1.0 : 0.5
+                                    z: -1
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onDoubleClicked: {
+                                            searchTextField.text = modelData
+                                            esploraFetcher.searchData(searchTextField.text)
+                                        }
                                     }
                                 }
                             }
@@ -172,21 +170,25 @@ Item {
                     }
                 }
 
-                ScrollView {
-                    width: 606
-                    height: 310
+                GroupBox {
+                    id: blockInfoGroupBox
+
+                    title: qsTr("Block info")
+
                     SplitView.minimumHeight: 50
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
 
-                    TextArea {
-                        id: blockInfoTextArea
+                    ScrollView {
+                        anchors.fill: parent
+                        clip: true
 
-                        property string title: ""
-                        property string value: ""
-                        wrapMode: Text.WrapAnywhere
-                        text: (title.length > 0 ? (title + ":\n") : "") + value
-                        selectByMouse: true
+                        TextArea {
+                            id: blockInfoTextArea
+
+                            wrapMode: Text.WrapAnywhere
+                            selectByMouse: true
+                        }
                     }
                 }
             }
@@ -202,61 +204,69 @@ Item {
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 600
 
-                ListView {
-                    id: transactionsListView
-                    width: 358
-                    height: 404
+                GroupBox {
+                    id: transactionsListGroupBox
+
+                    title: qsTr("Transactions list")
+
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 250
-                    clip: true
 
-                    model: esploraFetcher.transactionsList
-                    delegate: Item {
-                        x: 6
-                        width: textItem1.width
-                        height: 30
-                        Label {
-                            id: textItem1
-                            text: modelData
-                            anchors.verticalCenter: parent.verticalCenter
+                    ListView {
+                        id: transactionsListView
 
-                            Rectangle {
-                                color: "#d3d3d3"
-                                border.color: "#000000"
-                                border.width: 1
-                                opacity: enabled ? 1.0 : 0.5
-                                anchors.fill: parent
-                                anchors.margins: -5
-                                MouseArea {
+                        anchors.fill: parent
+                        clip: true
+                        interactive: true
+
+                        model: esploraFetcher.transactionsList
+                        delegate: Item {
+                            x: 6
+                            width: textItem1.width
+                            height: 30
+                            Label {
+                                id: textItem1
+                                text: modelData
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Rectangle {
+                                    color: "#d3d3d3"
+                                    border.color: "#000000"
+                                    border.width: 1
+                                    opacity: enabled ? 1.0 : 0.5
                                     anchors.fill: parent
-                                    onDoubleClicked: {
-                                        txTextArea.title = qsTr("Transaction info")
-                                        esploraFetcher.getTransactionInfo(searchTextField.text, modelData)
+                                    anchors.margins: -5
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onDoubleClicked: {
+                                            esploraFetcher.getTransactionInfo(searchTextField.text, modelData)
+                                        }
                                     }
+                                    z: -1
                                 }
-                                z: -1
                             }
                         }
                     }
-                    interactive: true
                 }
 
-                ScrollView {
-                    width: 369
-                    height: 576
+                GroupBox {
+                    id: transactionInfoGroupBox
+
+                    title: qsTr("Transaction Info")
+
                     SplitView.minimumHeight: 50
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
 
-                    TextArea {
-                        id: txTextArea
+                    ScrollView {
+                        anchors.fill: parent
 
-                        property string title: ""
-                        property string value: ""
-                        text: (title.length > 0 ? (title + ":\n") : "") + value
+                        TextArea {
+                            id: txTextArea
 
-                        wrapMode: Text.WrapAnywhere
-                        selectByMouse: true
+                            wrapMode: Text.WrapAnywhere
+                            selectByMouse: true
+                        }
                     }
                 }
             }
@@ -266,10 +276,10 @@ Item {
     Connections {
         target: esploraFetcher
         function onDataReady(data) {
-            blockInfoTextArea.value = data
+            blockInfoTextArea.text = data
         }
         function onTransactionDataReady(data) {
-            txTextArea.value = data
+            txTextArea.text = data
         }
 
         function onSearchingBlock(hash) {
