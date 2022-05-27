@@ -32,7 +32,7 @@ Item {
             Label {
                 id: searchLabel
 
-                text: qsTr("Search for")
+                text: qsTr("Current block")
             }
 
             TextField {
@@ -107,9 +107,10 @@ Item {
                     ListView {
                         id: blocksListView
 
+                        property int pressedIndex: -1
+
                         anchors.fill: parent
 
-                        property int pressedIndex: -1
                         clip: true
                         interactive: true
                         model: esploraFetcher.blocksList
@@ -261,6 +262,11 @@ Item {
                         id: transactionsListView
 
                         property int pressedIndex: -1
+                        onPressedIndexChanged: {
+                            let itemTxId = transactionsListView.itemAtIndex(pressedIndex).txId
+                            esploraFetcher.getTransactionInfo(itemTxId)
+                        }
+
                         anchors.fill: parent
                         clip: true
                         interactive: true
@@ -277,6 +283,9 @@ Item {
                         model: esploraFetcher.transactionsList
                         delegate: Item {
                             id: txRoot
+
+                            property string txId: modelData
+
                             x: 6
                             width: textItem1.width
                             height: 30
@@ -296,7 +305,6 @@ Item {
                                         anchors.fill: parent
                                         onClicked: {
                                             transactionsListView.pressedIndex = index
-                                            esploraFetcher.getTransactionInfo(searchTextField.text, modelData)
                                         }
                                     }
                                     z: -1
@@ -323,14 +331,14 @@ Item {
                             icon.source: "images/previous.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Previous")
-                            onClicked: transactionsListView.currentIndex--
+                            onClicked: transactionsListView.pressedIndex++
                         }
                         RoundButton {
                             implicitHeight: 20
                             icon.source: "images/next.svg"
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Next")
-                            onClicked: transactionsListView.currentIndex++
+                            onClicked: transactionsListView.pressedIndex--
                         }
                     }
 

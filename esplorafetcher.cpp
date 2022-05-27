@@ -76,7 +76,7 @@ void EsploraFetcher::getTransactions(const QString &hash)
     getRequest(c_baseUrl + theBlockTxIds, TransactionsList);
 }
 
-void EsploraFetcher::getTransactionInfo(const QString &hash, const QString &txId)
+void EsploraFetcher::getTransactionInfo(const QString &txId)
 {
     QString theTxInfo = c_transactionInfo;
 

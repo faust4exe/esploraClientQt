@@ -35,7 +35,7 @@ public:
     Q_INVOKABLE void fetchNewer();
     Q_INVOKABLE void searchData(const QString &hash = QString());
     Q_INVOKABLE void getTransactions(const QString &hash);
-    Q_INVOKABLE void getTransactionInfo(const QString &hash, const QString &txId);
+    Q_INVOKABLE void getTransactionInfo(const QString &txId);
     Q_INVOKABLE void getPrevBlock();
     Q_INVOKABLE void getNextBlock();
 
