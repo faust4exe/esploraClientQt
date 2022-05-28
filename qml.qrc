@@ -8,5 +8,9 @@
         <file>images/refresh.svg</file>
         <file>images/up.svg</file>
         <file>RefreshRoundButton.qml</file>
+        <file>UpRoundButton.qml</file>
+        <file>DownRoundButton.qml</file>
+        <file>NextRoundButton.qml</file>
+        <file>PrevRoundButton.qml</file>
     </qresource>
 </RCC>

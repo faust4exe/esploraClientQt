@@ -81,18 +81,10 @@ Item {
                         RefreshRoundButton {
                             onClicked: esploraFetcher.fetchData()
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/up.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Newer")
+                        UpRoundButton {
                             onClicked: esploraFetcher.fetchNewer()
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/down.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Older")
+                        DownRoundButton {
                             onClicked: esploraFetcher.fetchOlder()
                         }
                     }
@@ -188,21 +180,13 @@ Item {
                             Layout.leftMargin: 15
                             text: blockInfoGroupBox.title
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/previous.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Previous")
+                        PrevRoundButton {
                             onClicked: {
                                 blocksListView.selectedBlockAt--
                                 esploraFetcher.getPrevBlock()
                             }
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/next.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Next")
+                        NextRoundButton {
                             onClicked: {
                                 blocksListView.selectedBlockAt++
                                 esploraFetcher.getNextBlock()
@@ -259,11 +243,7 @@ Item {
                                 esploraFetcher.getTransactions(searchTextField.text)
                             }
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/up.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Newer")
+                        UpRoundButton {
                             onClicked: {
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex -= 25
@@ -271,11 +251,7 @@ Item {
                                                                transactionsListGroupBox.txShownIndex)
                             }
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/down.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Older")
+                        DownRoundButton {
                             onClicked: {
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex += 25
@@ -376,18 +352,10 @@ Item {
                             Layout.leftMargin: 15
                             text: transactionInfoGroupBox.title
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/previous.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Previous")
+                        PrevRoundButton {
                             onClicked: transactionsListView.pressedIndex++
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/next.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Next")
+                        NextRoundButton {
                             onClicked: transactionsListView.pressedIndex--
                         }
                     }
