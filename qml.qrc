@@ -13,5 +13,6 @@
         <file>NextRoundButton.qml</file>
         <file>PrevRoundButton.qml</file>
         <file>AnimatedTextArea.qml</file>
+        <file>AnimatedRoundButton.qml</file>
     </qresource>
 </RCC>
