@@ -7,5 +7,6 @@
         <file>images/previous.svg</file>
         <file>images/refresh.svg</file>
         <file>images/up.svg</file>
+        <file>RefreshRoundButton.qml</file>
     </qresource>
 </RCC>

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.11
 
@@ -78,11 +78,7 @@ Item {
                             Layout.leftMargin: 15
                             text: blocksGroupBox.title
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/refresh.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Refresh")
+                        RefreshRoundButton {
                             onClicked: esploraFetcher.fetchData()
                         }
                         RoundButton {
@@ -256,11 +252,7 @@ Item {
                             Layout.leftMargin: 15
                             text: transactionsListGroupBox.title
                         }
-                        RoundButton {
-                            implicitHeight: 20
-                            icon.source: "images/refresh.svg"
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Refresh")
+                        RefreshRoundButton {
                             onClicked: {
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex = 0
