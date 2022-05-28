@@ -116,30 +116,16 @@ Item {
                             visible: blocksListView.count == 0
                         }
 
-                        delegate: Rectangle {
-                            id: blRoot
-
-                            property bool isSelected: blocksListView.selectedBlockAt === modelData.blockHeight
-
-                            x: isSelected ? 10 : 0
-                            Behavior on x {
-                                NumberAnimation { duration: 500 }
-                            }
+                        delegate: ListViewDelegate {
+                            isSelected: blocksListView.selectedBlockAt === modelData.blockHeight
 
                             width: blocksListView.width - 20
-                            height: 25
-
-                            color: isSelected ? "#f3f3f3" : "#d3d3d3"
-                            border.width: 1
-                            border.color: "black"
-                            opacity: enabled ? 1.0 : 0.5
 
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 5
 
                                 Label {
-                                    id: textItem
                                     text: modelData.blockId
 
                                     elide: Text.ElideLeft
@@ -159,14 +145,11 @@ Item {
                                 }
                             }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    blockInfoTextArea.moveDirection = 0
-                                    blocksListView.selectedBlockAt = modelData.blockHeight
-                                    searchTextField.text = modelData.blockId
-                                    esploraFetcher.searchData(searchTextField.text)
-                                }
+                            onClicked: {
+                                blockInfoTextArea.moveDirection = 0
+                                blocksListView.selectedBlockAt = modelData.blockHeight
+                                searchTextField.text = modelData.blockId
+                                esploraFetcher.searchData(searchTextField.text)
                             }
                         }
                     }
@@ -295,30 +278,17 @@ Item {
 
                         model: esploraFetcher.transactionsList
 
-                        delegate: Rectangle {
-                            id: txRoot
-
+                        delegate: ListViewDelegate {
                             property string txId: modelData.txId
-                            property bool isSelected: txId === transactionsListView.selectedTxId
 
-                            x: isSelected ? 10 : 0
-                            Behavior on x {
-                                NumberAnimation { duration: 500 }
-                            }
-
-                            color: isSelected ? "#f3f3f3" : "#d3d3d3"
-                            border.color: "#000000"
-                            border.width: 1
-                            opacity: enabled ? 1.0 : 0.5
+                            isSelected: txId === transactionsListView.selectedTxId
 
                             width: transactionsListView.width - 20
-                            height: 25
 
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 5
                                 Label {
-                                    id: textItem1
                                     elide: Text.ElideLeft
                                     text: modelData.txId
                                     Layout.alignment: Qt.AlignVCenter
@@ -330,12 +300,9 @@ Item {
                                 }
                             }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    txTextArea.moveDirection = 0
-                                    transactionsListView.pressedIndex = index
-                                }
+                            onClicked: {
+                                txTextArea.moveDirection = 0
+                                transactionsListView.pressedIndex = index
                             }
                         }
                     }

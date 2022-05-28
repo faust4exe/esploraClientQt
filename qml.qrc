@@ -15,5 +15,6 @@
         <file>AnimatedTextArea.qml</file>
         <file>AnimatedRoundButton.qml</file>
         <file>AnimatedListView.qml</file>
+        <file>ListViewDelegate.qml</file>
     </qresource>
 </RCC>
