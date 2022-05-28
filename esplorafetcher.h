@@ -64,14 +64,13 @@ private:
     void updateBlocksList();
     void updateTransactionsList();
 
-
 private:
     void getRequest(const QString &adress, RequestType type = Undefined);
 
 private:
-    QNetworkAccessManager *m_networkManager;
+    QNetworkAccessManager *m_networkManager = nullptr;
     QFutureWatcher<QJsonDocument> m_futureWatcher;
-    QNetworkReply *m_reply;
+    QNetworkReply *m_reply = nullptr;
     RequestType m_requestType;
     QByteArray m_replyArray;
     QJsonDocument m_jsonDoc;

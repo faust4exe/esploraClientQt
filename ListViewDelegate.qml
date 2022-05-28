@@ -8,6 +8,7 @@ Rectangle {
     signal clicked()
 
     x: isSelected ? 10 : 0
+
     Behavior on x {
         NumberAnimation { duration: 500 }
     }

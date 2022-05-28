@@ -3,8 +3,10 @@ import QtQuick.Controls 2.15
 
 RoundButton {
     implicitHeight: 20
+
     Image {
         id: buttonImage
+
         anchors.centerIn: parent
         source: "images/refresh.svg"
         rotation: 180
@@ -13,6 +15,7 @@ RoundButton {
         width: height
         opacity: enabled ? 1.0 : 0.5
         transformOrigin: Item.Center
+
         NumberAnimation {
             id: refreshAnimation
             target: buttonImage
@@ -22,6 +25,7 @@ RoundButton {
             to: 540
         }
     }
+
     ToolTip.visible: hovered
     ToolTip.text: qsTr("Refresh")
 

@@ -9,6 +9,7 @@ Item {
 
     BusyIndicator {
         id: busyIndicator
+
         visible: esploraFetcher.isFetching
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
@@ -30,8 +31,6 @@ Item {
             Layout.fillWidth: true
 
             Label {
-                id: searchLabel
-
                 text: qsTr("Current block")
             }
 
@@ -48,6 +47,7 @@ Item {
 
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
+
                 onClicked: {
                     blockInfoTextArea.moveDirection = 0
                     esploraFetcher.searchData(searchTextField.text)
@@ -68,7 +68,6 @@ Item {
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 550
 
-
                 GroupBox {
                     id: blocksGroupBox
 
@@ -79,18 +78,21 @@ Item {
                             Layout.leftMargin: 15
                             text: blocksGroupBox.title
                         }
+
                         RefreshRoundButton {
                             onClicked: {
                                 blocksListView.populateDirection = 0
                                 esploraFetcher.fetchData()
                             }
                         }
+
                         UpRoundButton {
                             onClicked: {
                                 blocksListView.populateDirection = -1
                                 esploraFetcher.fetchNewer()
                             }
                         }
+
                         DownRoundButton {
                             onClicked: {
                                 blocksListView.populateDirection = 1
@@ -127,7 +129,6 @@ Item {
 
                                 Label {
                                     text: modelData.blockId
-
                                     elide: Text.ElideLeft
 
                                     Layout.alignment: Qt.AlignVCenter
@@ -163,10 +164,12 @@ Item {
 
                     label: RowLayout {
                         height: 50
+
                         Label {
                             Layout.leftMargin: 15
                             text: blockInfoGroupBox.title
                         }
+
                         PrevRoundButton {
                             onClicked: {
                                 blockInfoTextArea.moveDirection = 1
@@ -174,6 +177,7 @@ Item {
                                 esploraFetcher.getPrevBlock()
                             }
                         }
+
                         NextRoundButton {
                             onClicked: {
                                 blockInfoTextArea.moveDirection = -1
@@ -222,6 +226,7 @@ Item {
                             Layout.leftMargin: 15
                             text: transactionsListGroupBox.title
                         }
+
                         RefreshRoundButton {
                             onClicked: {
                                 transactionsListView.populateDirection = 0
@@ -230,6 +235,7 @@ Item {
                                 esploraFetcher.getTransactions(searchTextField.text)
                             }
                         }
+
                         UpRoundButton {
                             onClicked: {
                                 transactionsListView.populateDirection = -1
@@ -239,6 +245,7 @@ Item {
                                                                transactionsListGroupBox.txShownIndex)
                             }
                         }
+
                         DownRoundButton {
                             onClicked: {
                                 transactionsListView.populateDirection = 1
@@ -258,6 +265,7 @@ Item {
 
                         property string selectedTxId: ""
                         property int pressedIndex: -1
+
                         onPressedIndexChanged: {
                             if(pressedIndex < 0){
                                 return
@@ -288,12 +296,14 @@ Item {
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 5
+
                                 Label {
                                     elide: Text.ElideLeft
                                     text: modelData.txId
                                     Layout.alignment: Qt.AlignVCenter
                                     Layout.fillWidth: true
                                 }
+
                                 Label {
                                     text: " fee:" + modelData.txFee
                                     Layout.alignment: Qt.AlignVCenter
@@ -316,16 +326,19 @@ Item {
 
                     label: RowLayout {
                         height: 50
+
                         Label {
                             Layout.leftMargin: 15
                             text: transactionInfoGroupBox.title
                         }
+
                         PrevRoundButton {
                             onClicked: {
                                 txTextArea.moveDirection = 1
                                 transactionsListView.pressedIndex++
                             }
                         }
+
                         NextRoundButton {
                             onClicked: {
                                 txTextArea.moveDirection = -1
@@ -359,9 +372,11 @@ Item {
 
     Connections {
         target: esploraFetcher
+
         function onDataReady(data) {
             blockInfoTextArea.nextText = data
         }
+
         function onTransactionDataReady(data) {
             txTextArea.nextText = data
         }

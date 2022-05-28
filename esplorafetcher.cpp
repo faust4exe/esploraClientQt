@@ -119,7 +119,6 @@ void EsploraFetcher::getNextBlock()
 void EsploraFetcher::onReplyFinished()
 {
     m_replyArray = m_reply->readAll();
-//    qDebug() << "Reply w data: \n" << m_replyArray;
 
     if(m_requestType == BlockAt){
         const QString hash = m_replyArray;
@@ -205,7 +204,6 @@ void EsploraFetcher::updateBlocksList()
         const QDateTime timestamp =
             QDateTime::fromSecsSinceEpoch(object.value("timestamp").toInt());
 
-
         QVariantMap blockData;
         blockData.insert("blockId", blockId);
         blockData.insert("blockHeight", height);
@@ -225,8 +223,8 @@ void EsploraFetcher::updateTransactionsList()
 
     m_transactionsList.clear();
     QJsonArray transactionsArray = m_jsonDoc.array();
-    foreach(const QJsonValue &transactionsId, transactionsArray) {
-        const QJsonObject object = transactionsId.toObject();
+    foreach(const QJsonValue &transaction, transactionsArray) {
+        const QJsonObject object = transaction.toObject();
         const QString txId = object.value("txid").toString();
         const int fee = object.value("fee").toInt();
 
@@ -235,12 +233,12 @@ void EsploraFetcher::updateTransactionsList()
         txData.insert("txFee", fee);
         m_transactionsList.append(txData);
     }
+
     emit transactionsListChanged();
 }
 
 void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 {
-    qDebug() << "Requesting " << adress;
     QNetworkRequest request;
     request.setUrl(QUrl(adress));
 
@@ -249,6 +247,7 @@ void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 
     m_requestType = type;
     m_reply = m_networkManager->get(request);
+
     connect(m_reply, &QNetworkReply::finished,
             this, &EsploraFetcher::onReplyFinished);
     connect(m_reply, &QNetworkReply::errorOccurred,

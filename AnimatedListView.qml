@@ -16,6 +16,7 @@ ListView {
 
     populate: Transition {
         id: theTrans
+
         NumberAnimation {
             property: "y"
             from: theTrans.ViewTransition.destination.y
@@ -23,6 +24,7 @@ ListView {
             to: theTrans.ViewTransition.destination.y
             duration: 500
         }
+
         NumberAnimation {
             property: "x"
             from: theTrans.ViewTransition.destination.x
@@ -30,6 +32,7 @@ ListView {
             to: theTrans.ViewTransition.destination.x
             duration: 500
         }
+
         NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
     }
 }

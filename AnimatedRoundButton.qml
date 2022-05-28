@@ -34,6 +34,7 @@ RoundButton {
                 duration: 500
                 from: 0
             }
+
             NumberAnimation {
                 id: secondAnimation
 

@@ -1,6 +1,5 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.11
 
 TextArea {
     id: root
@@ -20,6 +19,7 @@ TextArea {
 
     SequentialAnimation {
         id: switchAnimation
+
         ParallelAnimation{
             NumberAnimation {
                 target: root
@@ -28,6 +28,7 @@ TextArea {
                 to: moveDirection * 50
                 duration: 500
             }
+
             NumberAnimation {
                 target: root
                 property: "opacity"
@@ -35,12 +36,14 @@ TextArea {
                 to: 0
             }
         }
+
         ScriptAction {
             script: {
                 root.text = nextText
                 nextText = ""
             }
         }
+
         ParallelAnimation {
             NumberAnimation {
                 target: root
@@ -49,6 +52,7 @@ TextArea {
                 to: 0
                 duration: 500
             }
+
             NumberAnimation {
                 target: root
                 property: "opacity"
