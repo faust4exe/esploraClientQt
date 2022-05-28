@@ -12,5 +12,6 @@
         <file>DownRoundButton.qml</file>
         <file>NextRoundButton.qml</file>
         <file>PrevRoundButton.qml</file>
+        <file>AnimatedTextArea.qml</file>
     </qresource>
 </RCC>

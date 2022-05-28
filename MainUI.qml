@@ -49,6 +49,7 @@ Item {
                 text: qsTr("Search")
                 Layout.minimumWidth: 100
                 onClicked: {
+                    blockInfoTextArea.moveDirection = 0
                     esploraFetcher.searchData(searchTextField.text)
                 }
             }
@@ -79,13 +80,22 @@ Item {
                             text: blocksGroupBox.title
                         }
                         RefreshRoundButton {
-                            onClicked: esploraFetcher.fetchData()
+                            onClicked: {
+                                blocksListView.inputDirection = 0
+                                esploraFetcher.fetchData()
+                            }
                         }
                         UpRoundButton {
-                            onClicked: esploraFetcher.fetchNewer()
+                            onClicked: {
+                                blocksListView.inputDirection = -1
+                                esploraFetcher.fetchNewer()
+                            }
                         }
                         DownRoundButton {
-                            onClicked: esploraFetcher.fetchOlder()
+                            onClicked: {
+                                blocksListView.inputDirection = 1
+                                esploraFetcher.fetchOlder()
+                            }
                         }
                     }
 
@@ -96,6 +106,7 @@ Item {
                         id: blocksListView
 
                         property int selectedBlockAt: -1
+                        property int inputDirection: 0
 
                         anchors.fill: parent
 
@@ -159,11 +170,31 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
+                                    blockInfoTextArea.moveDirection = 0
                                     blocksListView.selectedBlockAt = modelData.blockHeight
                                     searchTextField.text = modelData.blockId
                                     esploraFetcher.searchData(searchTextField.text)
                                 }
                             }
+                        }
+
+                        populate: Transition {
+                            id: blocksTrans
+                            NumberAnimation {
+                                property: "y"
+                                from: blocksTrans.ViewTransition.destination.y
+                                      + (blocksListView.inputDirection != 0 ? 25 * blocksListView.inputDirection : 0)
+                                to: blocksTrans.ViewTransition.destination.y
+                                duration: 500
+                            }
+                            NumberAnimation {
+                                property: "x"
+                                from: blocksTrans.ViewTransition.destination.x
+                                        + (blocksListView.inputDirection == 0 ? 25 : 0)
+                                to: blocksTrans.ViewTransition.destination.x
+                                duration: 500
+                            }
+                            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
                         }
                     }
                 }
@@ -182,12 +213,14 @@ Item {
                         }
                         PrevRoundButton {
                             onClicked: {
+                                blockInfoTextArea.moveDirection = 1
                                 blocksListView.selectedBlockAt--
                                 esploraFetcher.getPrevBlock()
                             }
                         }
                         NextRoundButton {
                             onClicked: {
+                                blockInfoTextArea.moveDirection = -1
                                 blocksListView.selectedBlockAt++
                                 esploraFetcher.getNextBlock()
                             }
@@ -202,11 +235,8 @@ Item {
                         anchors.fill: parent
                         clip: true
 
-                        TextArea {
+                        AnimatedTextArea {
                             id: blockInfoTextArea
-
-                            wrapMode: Text.WrapAnywhere
-                            selectByMouse: true
 
                             Label {
                                 anchors.centerIn: parent
@@ -238,6 +268,7 @@ Item {
                         }
                         RefreshRoundButton {
                             onClicked: {
+                                transactionsListView.inputDirection = 0
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex = 0
                                 esploraFetcher.getTransactions(searchTextField.text)
@@ -245,6 +276,7 @@ Item {
                         }
                         UpRoundButton {
                             onClicked: {
+                                transactionsListView.inputDirection = -1
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex -= 25
                                 esploraFetcher.getTransactions(searchTextField.text,
@@ -253,6 +285,7 @@ Item {
                         }
                         DownRoundButton {
                             onClicked: {
+                                transactionsListView.inputDirection = 1
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex += 25
                                 esploraFetcher.getTransactions(searchTextField.text,
@@ -268,6 +301,7 @@ Item {
                         id: transactionsListView
 
                         property string selectedTxId: ""
+                        property int inputDirection: 0
                         property int pressedIndex: -1
                         onPressedIndexChanged: {
                             if(pressedIndex < 0){
@@ -333,9 +367,30 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
+                                    txTextArea.moveDirection = 0
                                     transactionsListView.pressedIndex = index
                                 }
                             }
+                        }
+
+                        populate: Transition {
+                            id: txTrans
+                            NumberAnimation {
+                                property: "y"
+                                from: txTrans.ViewTransition.destination.y
+                                      + (transactionsListView.inputDirection != 0
+                                            ? 25 * transactionsListView.inputDirection : 0)
+                                to: txTrans.ViewTransition.destination.y
+                                duration: 500
+                            }
+                            NumberAnimation {
+                                property: "x"
+                                from: txTrans.ViewTransition.destination.x
+                                        + (transactionsListView.inputDirection == 0 ? 25 : 0)
+                                to: txTrans.ViewTransition.destination.x
+                                duration: 500
+                            }
+                            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
                         }
                     }
                 }
@@ -353,10 +408,16 @@ Item {
                             text: transactionInfoGroupBox.title
                         }
                         PrevRoundButton {
-                            onClicked: transactionsListView.pressedIndex++
+                            onClicked: {
+                                txTextArea.moveDirection = 1
+                                transactionsListView.pressedIndex++
+                            }
                         }
                         NextRoundButton {
-                            onClicked: transactionsListView.pressedIndex--
+                            onClicked: {
+                                txTextArea.moveDirection = -1
+                                transactionsListView.pressedIndex--
+                            }
                         }
                     }
 
@@ -367,11 +428,8 @@ Item {
                     ScrollView {
                         anchors.fill: parent
 
-                        TextArea {
+                        AnimatedTextArea {
                             id: txTextArea
-
-                            wrapMode: Text.WrapAnywhere
-                            selectByMouse: true
 
                             Label {
                                 anchors.centerIn: parent
@@ -389,10 +447,10 @@ Item {
     Connections {
         target: esploraFetcher
         function onDataReady(data) {
-            blockInfoTextArea.text = data
+            blockInfoTextArea.nextText = data
         }
         function onTransactionDataReady(data) {
-            txTextArea.text = data
+            txTextArea.nextText = data
         }
 
         function onSearchingBlock(hash) {
