@@ -81,19 +81,19 @@ Item {
                         }
                         RefreshRoundButton {
                             onClicked: {
-                                blocksListView.inputDirection = 0
+                                blocksListView.populateDirection = 0
                                 esploraFetcher.fetchData()
                             }
                         }
                         UpRoundButton {
                             onClicked: {
-                                blocksListView.inputDirection = -1
+                                blocksListView.populateDirection = -1
                                 esploraFetcher.fetchNewer()
                             }
                         }
                         DownRoundButton {
                             onClicked: {
-                                blocksListView.inputDirection = 1
+                                blocksListView.populateDirection = 1
                                 esploraFetcher.fetchOlder()
                             }
                         }
@@ -102,18 +102,12 @@ Item {
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 350
 
-                    ListView {
+                    AnimatedListView {
                         id: blocksListView
 
                         property int selectedBlockAt: -1
-                        property int inputDirection: 0
 
-                        anchors.fill: parent
-
-                        clip: true
-                        interactive: true
                         model: esploraFetcher.blocksList
-                        spacing: 5
 
                         Label {
                             anchors.centerIn: parent
@@ -121,8 +115,6 @@ Item {
                             text: qsTr("Press refresh to fetch fresh items")
                             visible: blocksListView.count == 0
                         }
-
-                        ScrollBar.vertical: ScrollBar {}
 
                         delegate: Rectangle {
                             id: blRoot
@@ -176,25 +168,6 @@ Item {
                                     esploraFetcher.searchData(searchTextField.text)
                                 }
                             }
-                        }
-
-                        populate: Transition {
-                            id: blocksTrans
-                            NumberAnimation {
-                                property: "y"
-                                from: blocksTrans.ViewTransition.destination.y
-                                      + (blocksListView.inputDirection != 0 ? 25 * blocksListView.inputDirection : 0)
-                                to: blocksTrans.ViewTransition.destination.y
-                                duration: 500
-                            }
-                            NumberAnimation {
-                                property: "x"
-                                from: blocksTrans.ViewTransition.destination.x
-                                        + (blocksListView.inputDirection == 0 ? 25 : 0)
-                                to: blocksTrans.ViewTransition.destination.x
-                                duration: 500
-                            }
-                            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
                         }
                     }
                 }
@@ -268,7 +241,7 @@ Item {
                         }
                         RefreshRoundButton {
                             onClicked: {
-                                transactionsListView.inputDirection = 0
+                                transactionsListView.populateDirection = 0
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex = 0
                                 esploraFetcher.getTransactions(searchTextField.text)
@@ -276,7 +249,7 @@ Item {
                         }
                         UpRoundButton {
                             onClicked: {
-                                transactionsListView.inputDirection = -1
+                                transactionsListView.populateDirection = -1
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex -= 25
                                 esploraFetcher.getTransactions(searchTextField.text,
@@ -285,7 +258,7 @@ Item {
                         }
                         DownRoundButton {
                             onClicked: {
-                                transactionsListView.inputDirection = 1
+                                transactionsListView.populateDirection = 1
                                 transactionsListView.pressedIndex = -1
                                 transactionsListGroupBox.txShownIndex += 25
                                 esploraFetcher.getTransactions(searchTextField.text,
@@ -297,11 +270,10 @@ Item {
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 250
 
-                    ListView {
+                    AnimatedListView {
                         id: transactionsListView
 
                         property string selectedTxId: ""
-                        property int inputDirection: 0
                         property int pressedIndex: -1
                         onPressedIndexChanged: {
                             if(pressedIndex < 0){
@@ -312,10 +284,6 @@ Item {
                             esploraFetcher.getTransactionInfo(selectedTxId)
                         }
 
-                        anchors.fill: parent
-                        clip: true
-                        interactive: true
-
                         Label {
                             anchors.centerIn: parent
                             opacity: 0.5
@@ -324,10 +292,8 @@ Item {
                                      && searchTextField.text != ""
                                      && transactionsListView.count == 0
                         }
-                        ScrollBar.vertical: ScrollBar {}
 
                         model: esploraFetcher.transactionsList
-                        spacing: 5
 
                         delegate: Rectangle {
                             id: txRoot
@@ -371,26 +337,6 @@ Item {
                                     transactionsListView.pressedIndex = index
                                 }
                             }
-                        }
-
-                        populate: Transition {
-                            id: txTrans
-                            NumberAnimation {
-                                property: "y"
-                                from: txTrans.ViewTransition.destination.y
-                                      + (transactionsListView.inputDirection != 0
-                                            ? 25 * transactionsListView.inputDirection : 0)
-                                to: txTrans.ViewTransition.destination.y
-                                duration: 500
-                            }
-                            NumberAnimation {
-                                property: "x"
-                                from: txTrans.ViewTransition.destination.x
-                                        + (transactionsListView.inputDirection == 0 ? 25 : 0)
-                                to: txTrans.ViewTransition.destination.x
-                                duration: 500
-                            }
-                            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
                         }
                     }
                 }
