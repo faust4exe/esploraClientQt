@@ -107,7 +107,7 @@ Item {
                     ListView {
                         id: blocksListView
 
-                        property int pressedIndex: -1
+                        property int selectedBlockAt: -1
 
                         anchors.fill: parent
 
@@ -128,10 +128,17 @@ Item {
                         delegate: Rectangle {
                             id: blRoot
 
-                            width: blocksListView.width - 10
+                            property bool isSelected: blocksListView.selectedBlockAt === modelData.blockHeight
+
+                            x: isSelected ? 10 : 0
+                            Behavior on x {
+                                NumberAnimation { duration: 500 }
+                            }
+
+                            width: blocksListView.width - 20
                             height: 25
 
-                            color: blocksListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
+                            color: isSelected ? "#f3f3f3" : "#d3d3d3"
                             border.width: 1
                             border.color: "black"
                             opacity: enabled ? 1.0 : 0.5
@@ -164,7 +171,7 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    blocksListView.pressedIndex = index
+                                    blocksListView.selectedBlockAt = modelData.blockHeight
                                     searchTextField.text = modelData.blockId
                                     esploraFetcher.searchData(searchTextField.text)
                                 }
@@ -191,7 +198,7 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Previous")
                             onClicked: {
-                                blocksListView.pressedIndex++
+                                blocksListView.selectedBlockAt--
                                 esploraFetcher.getPrevBlock()
                             }
                         }
@@ -201,7 +208,7 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: qsTr("Next")
                             onClicked: {
-                                blocksListView.pressedIndex--
+                                blocksListView.selectedBlockAt++
                                 esploraFetcher.getNextBlock()
                             }
                         }
@@ -292,14 +299,15 @@ Item {
                     ListView {
                         id: transactionsListView
 
+                        property string selectedTxId: ""
                         property int pressedIndex: -1
                         onPressedIndexChanged: {
-                            if(pressedIndex === -1){
+                            if(pressedIndex < 0){
                                 return
                             }
 
-                            let itemTxId = transactionsListView.itemAtIndex(pressedIndex).txId
-                            esploraFetcher.getTransactionInfo(itemTxId)
+                            selectedTxId = transactionsListView.itemAtIndex(pressedIndex).txId
+                            esploraFetcher.getTransactionInfo(selectedTxId)
                         }
 
                         anchors.fill: parent
@@ -323,8 +331,14 @@ Item {
                             id: txRoot
 
                             property string txId: modelData.txId
+                            property bool isSelected: txId === transactionsListView.selectedTxId
 
-                            color: transactionsListView.pressedIndex !== index ? "#d3d3d3" : "#f3f3f3"
+                            x: isSelected ? 10 : 0
+                            Behavior on x {
+                                NumberAnimation { duration: 500 }
+                            }
+
+                            color: isSelected ? "#f3f3f3" : "#d3d3d3"
                             border.color: "#000000"
                             border.width: 1
                             opacity: enabled ? 1.0 : 0.5
