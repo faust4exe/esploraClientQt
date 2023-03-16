@@ -127,8 +127,13 @@ void EsploraFetcher::onReplyFinished()
         return;
     }
 
+#if QT_VERSION > 0x060000
+    QFuture<QJsonDocument> future =
+            QtConcurrent::run(&EsploraFetcher::parseDocument, this, m_replyArray);
+#else
     QFuture<QJsonDocument> future =
             QtConcurrent::run(this, &EsploraFetcher::parseDocument, m_replyArray);
+#endif
     m_futureWatcher.setFuture(future);
 }
 
@@ -207,8 +212,13 @@ void EsploraFetcher::updateBlocksList()
         QVariantMap blockData;
         blockData.insert("blockId", blockId);
         blockData.insert("blockHeight", height);
+#if QT_VERSION > 0x060000
+        blockData.insert("blockTimestamp",
+                         QLocale::system().toString(timestamp, QLocale::ShortFormat));
+#else
         blockData.insert("blockTimestamp",
                          timestamp.toString(Qt::SystemLocaleShortDate));
+#endif
         m_blocksList.append(blockData);
         m_lowestBlockHeight = height;
     }
@@ -250,8 +260,13 @@ void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 
     connect(m_reply, &QNetworkReply::finished,
             this, &EsploraFetcher::onReplyFinished);
+#if QT_VERSION < 0x051500
+    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
+            this, SLOT(onErrorOccured()));
+#else
     connect(m_reply, &QNetworkReply::errorOccurred,
             this, &EsploraFetcher::onErrorOccured);
+#endif
     connect(m_reply, &QNetworkReply::sslErrors,
             this, &EsploraFetcher::onSslError);
 }
