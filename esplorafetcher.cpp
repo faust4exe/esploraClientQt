@@ -1,10 +1,14 @@
 #include "esplorafetcher.h"
 
+#ifndef Q_OS_WASM
 #include <QtConcurrent>
 #include <QFuture>
+#endif
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
+#include <QJsonArray>
+#include <QSslSocket>
 
 const QString c_baseUrl("https://blockstream.info/api");
 const QString c_blockInfo("/block/:hash");
@@ -18,20 +22,28 @@ const QString c_blockAtHeight("/block-height/:height");
 EsploraFetcher::EsploraFetcher(QObject *parent)
     : QObject(parent)
 {
+#ifndef Q_OS_WASM
     qDebug() << " supportsSsl(): " << QSslSocket::supportsSsl()
              << "\n sslLibraryBuildVersionString(): "  << QSslSocket::sslLibraryBuildVersionString()
              << "\n slLibraryVersionString(): "<< QSslSocket::sslLibraryVersionString();
+#else
+    qDebug() << " supportsSsl(): No for WASM";
+#endif
 
     m_networkManager = new QNetworkAccessManager(this);
+#ifndef Q_OS_WASM
     connect(m_networkManager, &QNetworkAccessManager::encrypted,
             this, &EsploraFetcher::onEncrypted);
     connect(&m_futureWatcher, &QFutureWatcher<QJsonDocument>::finished,
             this, &EsploraFetcher::parseFinished);
+#endif
 }
 
 EsploraFetcher::~EsploraFetcher()
 {
+#ifndef Q_OS_WASM
     m_futureWatcher.cancel();
+#endif
 }
 
 void EsploraFetcher::fetchData()
@@ -127,6 +139,7 @@ void EsploraFetcher::onReplyFinished()
         return;
     }
 
+#ifndef Q_OS_WASM
 #if QT_VERSION > 0x060000
     QFuture<QJsonDocument> future =
             QtConcurrent::run(&EsploraFetcher::parseDocument, this, m_replyArray);
@@ -135,6 +148,9 @@ void EsploraFetcher::onReplyFinished()
             QtConcurrent::run(this, &EsploraFetcher::parseDocument, m_replyArray);
 #endif
     m_futureWatcher.setFuture(future);
+#else
+    parseResult( parseDocument(m_replyArray) );
+#endif
 }
 
 void EsploraFetcher::onErrorOccured()
@@ -145,10 +161,14 @@ void EsploraFetcher::onErrorOccured()
 
 void EsploraFetcher::onSslError(const QList<QSslError> &errors)
 {
+#ifndef Q_OS_WASM
     qDebug() << "Got Ssl Errors : ";
     foreach(auto &error, errors) {
         qDebug() << error.errorString();
     }
+#else
+    qDebug() << "WASM cannot get ssl errors";
+#endif
 }
 
 void EsploraFetcher::onEncrypted(QNetworkReply *reply)
@@ -159,7 +179,14 @@ void EsploraFetcher::onEncrypted(QNetworkReply *reply)
 
 void EsploraFetcher::parseFinished()
 {
-    m_jsonDoc = m_futureWatcher.result();
+#ifndef Q_OS_WASM
+    parseResult(m_futureWatcher.result());
+#endif
+}
+
+void EsploraFetcher::parseResult(const QJsonDocument &result)
+{
+    m_jsonDoc = result;
 
     QString replyData;
     if(m_jsonDoc.isNull()){
@@ -267,8 +294,10 @@ void EsploraFetcher::getRequest(const QString &adress, RequestType type)
     connect(m_reply, &QNetworkReply::errorOccurred,
             this, &EsploraFetcher::onErrorOccured);
 #endif
+#ifndef Q_OS_WASM
     connect(m_reply, &QNetworkReply::sslErrors,
             this, &EsploraFetcher::onSslError);
+#endif
 }
 
 

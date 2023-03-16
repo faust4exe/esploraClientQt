@@ -4,7 +4,9 @@
 #include "qqmlengine.h"
 
 #include <QJsonDocument>
+#ifndef Q_OS_WASM
 #include <QFutureWatcher>
+#endif
 #include <QObject>
 #include <QSslError>
 
@@ -60,6 +62,7 @@ private slots:
     void parseFinished();
 
 private:
+    void parseResult(const QJsonDocument &result);
     QJsonDocument parseDocument(const QByteArray &array) const;
     void updateBlocksList();
     void updateTransactionsList();
@@ -69,7 +72,9 @@ private:
 
 private:
     QNetworkAccessManager *m_networkManager = nullptr;
+#ifndef Q_OS_WASM
     QFutureWatcher<QJsonDocument> m_futureWatcher;
+#endif
     QNetworkReply *m_reply = nullptr;
     RequestType m_requestType;
     QByteArray m_replyArray;
