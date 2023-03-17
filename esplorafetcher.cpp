@@ -167,6 +167,7 @@ void EsploraFetcher::onSslError(const QList<QSslError> &errors)
         qDebug() << error.errorString();
     }
 #else
+    Q_UNUSED(errors)
     qDebug() << "WASM cannot get ssl errors";
 #endif
 }

@@ -1,6 +1,8 @@
 QT += quick
 QT += network
+QT += svg
 !wasm: QT += concurrent
+android: include(lib/openssl/openssl.pri)
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
