@@ -24,35 +24,8 @@ Item {
         enabled: !busyIndicator.visible
         spacing: 10
 
-        RowLayout {
-            id: searchLayout
-
-            height: 30
+        SearchBarRow {
             Layout.fillWidth: true
-
-            Label {
-                text: qsTr("Current block")
-            }
-
-            TextField {
-                id: searchTextField
-
-                Layout.fillWidth: true
-                placeholderText: qsTr("Block hash")
-                selectByMouse: true
-            }
-
-            Button {
-                id: searchButton
-
-                text: qsTr("Search")
-                Layout.minimumWidth: 100
-
-                onClicked: {
-                    blockInfoTextArea.moveDirection = 0
-                    esploraFetcher.searchData(searchTextField.text)
-                }
-            }
         }
 
         SplitView {
@@ -68,144 +41,15 @@ Item {
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 550
 
-                GroupBox {
-                    id: blocksGroupBox
-
-                    title: qsTr("Blocks list")
-
-                    label: RowLayout {
-                        Label {
-                            Layout.leftMargin: 15
-                            text: blocksGroupBox.title
-                        }
-
-                        RefreshRoundButton {
-                            onClicked: {
-                                blocksListView.populateDirection = 0
-                                esploraFetcher.fetchData()
-                            }
-                        }
-
-                        UpRoundButton {
-                            onClicked: {
-                                blocksListView.populateDirection = -1
-                                esploraFetcher.fetchNewer()
-                            }
-                        }
-
-                        DownRoundButton {
-                            onClicked: {
-                                blocksListView.populateDirection = 1
-                                esploraFetcher.fetchOlder()
-                            }
-                        }
-                    }
-
+                BlocksListGroupBox {
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 350
-
-                    AnimatedListView {
-                        id: blocksListView
-
-                        property int selectedBlockAt: -1
-
-                        model: esploraFetcher.blocksList
-
-                        Label {
-                            anchors.centerIn: parent
-                            opacity: 0.5
-                            text: qsTr("Press refresh to fetch fresh items")
-                            visible: blocksListView.count == 0
-                        }
-
-                        delegate: ListViewDelegate {
-                            isSelected: blocksListView.selectedBlockAt === modelData.blockHeight
-
-                            width: blocksListView.width - 20
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 5
-
-                                Label {
-                                    text: modelData.blockId
-                                    elide: Text.ElideLeft
-
-                                    Layout.alignment: Qt.AlignVCenter
-                                    Layout.fillWidth: true
-                                }
-
-                                Label {
-                                    text: " @" + modelData.blockHeight
-                                    Layout.alignment: Qt.AlignVCenter
-                                }
-
-                                Label {
-                                    text: " #" + modelData.blockTimestamp
-                                    Layout.alignment: Qt.AlignVCenter
-                                }
-                            }
-
-                            onClicked: {
-                                blockInfoTextArea.moveDirection = 0
-                                blocksListView.selectedBlockAt = modelData.blockHeight
-                                searchTextField.text = modelData.blockId
-                                esploraFetcher.searchData(searchTextField.text)
-                            }
-                        }
-                    }
                 }
 
-                GroupBox {
-                    id: blockInfoGroupBox
-
-                    title: qsTr("Block info")
-                    topPadding: 50
-
-                    label: RowLayout {
-                        height: 50
-
-                        Label {
-                            Layout.leftMargin: 15
-                            text: blockInfoGroupBox.title
-                        }
-
-                        PrevRoundButton {
-                            onClicked: {
-                                blockInfoTextArea.moveDirection = 1
-                                blocksListView.selectedBlockAt--
-                                esploraFetcher.getPrevBlock()
-                            }
-                        }
-
-                        NextRoundButton {
-                            onClicked: {
-                                blockInfoTextArea.moveDirection = -1
-                                blocksListView.selectedBlockAt++
-                                esploraFetcher.getNextBlock()
-                            }
-                        }
-                    }
-
-                    SplitView.minimumHeight: 50
+                BlockInfoGroupBox {
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
-
-                    ScrollView {
-                        anchors.fill: parent
-                        clip: true
-
-                        AnimatedTextArea {
-                            id: blockInfoTextArea
-
-                            Label {
-                                anchors.centerIn: parent
-                                opacity: 0.5
-                                text: qsTr("Select a block in list to fetch block details")
-                                visible: blocksListView.count > 0 && blockInfoTextArea.text == ""
-                            }
-                        }
-                    }
+                    SplitView.minimumHeight: 50
                 }
             }
 
@@ -215,174 +59,17 @@ Item {
                 SplitView.minimumWidth: 50
                 SplitView.preferredWidth: 600
 
-                GroupBox {
-                    id: transactionsListGroupBox
-
-                    property int txShownIndex: 0
-                    title: qsTr("Transactions list")
-
-                    label: RowLayout {
-                        Label {
-                            Layout.leftMargin: 15
-                            text: transactionsListGroupBox.title
-                        }
-
-                        RefreshRoundButton {
-                            onClicked: {
-                                transactionsListView.populateDirection = 0
-                                transactionsListView.pressedIndex = -1
-                                transactionsListGroupBox.txShownIndex = 0
-                                esploraFetcher.getTransactions(searchTextField.text)
-                            }
-                        }
-
-                        UpRoundButton {
-                            onClicked: {
-                                transactionsListView.populateDirection = -1
-                                transactionsListView.pressedIndex = -1
-                                transactionsListGroupBox.txShownIndex -= 25
-                                esploraFetcher.getTransactions(searchTextField.text,
-                                                               transactionsListGroupBox.txShownIndex)
-                            }
-                        }
-
-                        DownRoundButton {
-                            onClicked: {
-                                transactionsListView.populateDirection = 1
-                                transactionsListView.pressedIndex = -1
-                                transactionsListGroupBox.txShownIndex += 25
-                                esploraFetcher.getTransactions(searchTextField.text,
-                                                               transactionsListGroupBox.txShownIndex)
-                            }
-                        }
-                    }
-
+                TransactionsListGroupBox {
                     SplitView.minimumHeight: 50
                     SplitView.preferredHeight: 250
-
-                    AnimatedListView {
-                        id: transactionsListView
-
-                        property string selectedTxId: ""
-                        property int pressedIndex: -1
-
-                        onPressedIndexChanged: {
-                            if(pressedIndex < 0){
-                                return
-                            }
-
-                            selectedTxId = transactionsListView.itemAtIndex(pressedIndex).txId
-                            esploraFetcher.getTransactionInfo(selectedTxId)
-                        }
-
-                        Label {
-                            anchors.centerIn: parent
-                            opacity: 0.5
-                            text: qsTr("Press refresh to fetch block transactions")
-                            visible: blocksListView.count > 0
-                                     && searchTextField.text != ""
-                                     && transactionsListView.count == 0
-                        }
-
-                        model: esploraFetcher.transactionsList
-
-                        delegate: ListViewDelegate {
-                            property string txId: modelData.txId
-
-                            isSelected: txId === transactionsListView.selectedTxId
-
-                            width: transactionsListView.width - 20
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 5
-
-                                Label {
-                                    elide: Text.ElideLeft
-                                    text: modelData.txId
-                                    Layout.alignment: Qt.AlignVCenter
-                                    Layout.fillWidth: true
-                                }
-
-                                Label {
-                                    text: " fee:" + modelData.txFee
-                                    Layout.alignment: Qt.AlignVCenter
-                                }
-                            }
-
-                            onClicked: {
-                                txTextArea.moveDirection = 0
-                                transactionsListView.pressedIndex = index
-                            }
-                        }
-                    }
                 }
 
-                GroupBox {
-                    id: transactionInfoGroupBox
-
-                    title: qsTr("Transaction Info")
-                    topPadding: 50
-
-                    label: RowLayout {
-                        height: 50
-
-                        Label {
-                            Layout.leftMargin: 15
-                            text: transactionInfoGroupBox.title
-                        }
-
-                        PrevRoundButton {
-                            onClicked: {
-                                txTextArea.moveDirection = 1
-                                transactionsListView.pressedIndex++
-                            }
-                        }
-
-                        NextRoundButton {
-                            onClicked: {
-                                txTextArea.moveDirection = -1
-                                transactionsListView.pressedIndex--
-                            }
-                        }
-                    }
-
-                    SplitView.minimumHeight: 50
+                TransactionInfoGroupBox {
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
-
-                    ScrollView {
-                        anchors.fill: parent
-
-                        AnimatedTextArea {
-                            id: txTextArea
-
-                            Label {
-                                anchors.centerIn: parent
-                                opacity: 0.5
-                                text: qsTr("Select a transaction in list to fetch its details")
-                                visible: txTextArea.text == "" && transactionsListView.count > 0
-                            }
-                        }
-                    }
+                    SplitView.minimumHeight: 50
                 }
             }
-        }
-    }
-
-    Connections {
-        target: esploraFetcher
-
-        function onDataReady(data) {
-            blockInfoTextArea.nextText = data
-        }
-
-        function onTransactionDataReady(data) {
-            txTextArea.nextText = data
-        }
-
-        function onSearchingBlock(hash) {
-            searchTextField.text = hash
         }
     }
 }

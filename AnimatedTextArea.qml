@@ -14,6 +14,7 @@ TextArea {
         if(nextText == "") {
             return
         }
+
         switchAnimation.start()
     }
 
@@ -40,7 +41,6 @@ TextArea {
         ScriptAction {
             script: {
                 root.text = nextText
-                nextText = ""
             }
         }
 

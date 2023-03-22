@@ -16,5 +16,11 @@
         <file>AnimatedRoundButton.qml</file>
         <file>AnimatedListView.qml</file>
         <file>ListViewDelegate.qml</file>
+        <file>MainPagesUI.qml</file>
+        <file>BlocksListGroupBox.qml</file>
+        <file>BlockInfoGroupBox.qml</file>
+        <file>TransactionsListGroupBox.qml</file>
+        <file>TransactionInfoGroupBox.qml</file>
+        <file>SearchBarRow.qml</file>
     </qresource>
 </RCC>

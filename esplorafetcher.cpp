@@ -110,6 +110,7 @@ void EsploraFetcher::getPrevBlock()
     QJsonValue jsonValue = jsonObj.value("previousblockhash");
     if(!jsonValue.isNull()){
         const QString hash = jsonValue.toString();
+        setSelectedBlockId(hash);
         emit searchingBlock(hash);
         searchData(hash);
     }
@@ -134,6 +135,7 @@ void EsploraFetcher::onReplyFinished()
 
     if(m_requestType == BlockAt){
         const QString hash = m_replyArray;
+        setSelectedBlockId(hash);
         emit searchingBlock(hash);
         searchData(hash);
         return;
@@ -192,6 +194,7 @@ void EsploraFetcher::parseResult(const QJsonDocument &result)
     QString replyData;
     if(m_jsonDoc.isNull()){
         replyData = m_replyArray;
+        setBlockInfoData(replyData);
         emit dataReady(replyData);
     }
     else if(m_requestType == TransactionsList) {
@@ -199,6 +202,7 @@ void EsploraFetcher::parseResult(const QJsonDocument &result)
     }
     else if(m_requestType == TransactionInfo) {
         replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+        setTransactionInfoData(replyData);
         emit transactionDataReady(replyData);
     }
     else {
@@ -207,6 +211,7 @@ void EsploraFetcher::parseResult(const QJsonDocument &result)
         }
         else {
             replyData = m_jsonDoc.toJson(QJsonDocument::Indented);
+            setBlockInfoData(replyData);
             emit dataReady(replyData);
         }
     }
@@ -315,4 +320,109 @@ const QVariantList &EsploraFetcher::transactionsList() const
 bool EsploraFetcher::isFetching() const
 {
     return m_isFetching;
+}
+
+QString EsploraFetcher::selectedBlockId() const
+{
+    return m_selectedBlockId;
+}
+
+void EsploraFetcher::setSelectedBlockId(const QString &newSelectedBlockId)
+{
+    if (m_selectedBlockId == newSelectedBlockId) {
+        return;
+    }
+
+    m_selectedBlockId = newSelectedBlockId;
+    emit selectedBlockIdChanged();
+}
+
+int EsploraFetcher::selectedBlockHeight() const
+{
+    return m_selectedBlockHeight;
+}
+
+void EsploraFetcher::setSelectedBlockHeight(int newSelectedBlockHeight)
+{
+    if (m_selectedBlockHeight == newSelectedBlockHeight) {
+        return;
+    }
+
+    m_selectedBlockHeight = newSelectedBlockHeight;
+    emit selectedBlockHeightChanged();
+}
+
+int EsploraFetcher::blockInfoMoveDirection() const
+{
+    return m_blockInfoMoveDirection;
+}
+
+void EsploraFetcher::setBlockInfoMoveDirection(int newBlockInfoMoveDirection)
+{
+    if (m_blockInfoMoveDirection == newBlockInfoMoveDirection) {
+        return;
+    }
+
+    m_blockInfoMoveDirection = newBlockInfoMoveDirection;
+    emit blockInfoMoveDirectionChanged();
+}
+
+int EsploraFetcher::transactionInfoMoveDirection() const
+{
+    return m_transactionInfoMoveDirection;
+}
+
+void EsploraFetcher::setTransactionInfoMoveDirection(int newTransactionInfoMoveDirection)
+{
+    if (m_transactionInfoMoveDirection == newTransactionInfoMoveDirection) {
+        return;
+    }
+
+    m_transactionInfoMoveDirection = newTransactionInfoMoveDirection;
+    emit transactionInfoMoveDirectionChanged();
+}
+
+QString EsploraFetcher::blockInfoData() const
+{
+    return m_blockInfoData;
+}
+
+void EsploraFetcher::setBlockInfoData(const QString &newBlockInfoData)
+{
+    if (m_blockInfoData == newBlockInfoData) {
+        return;
+    }
+
+    m_blockInfoData = newBlockInfoData;
+    emit blockInfoDataChanged();
+}
+
+int EsploraFetcher::transactionsListSelectedIndex() const
+{
+    return m_transactionsListSelectedIndex;
+}
+
+void EsploraFetcher::setTransactionsListSelectedIndex(int newTransactionsListSelectedIndex)
+{
+    if (m_transactionsListSelectedIndex == newTransactionsListSelectedIndex) {
+        return;
+    }
+
+    m_transactionsListSelectedIndex = newTransactionsListSelectedIndex;
+    emit transactionsListSelectedIndexChanged();
+}
+
+QString EsploraFetcher::transactionInfoData() const
+{
+    return m_transactionInfoData;
+}
+
+void EsploraFetcher::setTransactionInfoData(const QString &newTransactionInfoData)
+{
+    if (m_transactionInfoData == newTransactionInfoData) {
+        return;
+    }
+
+    m_transactionInfoData = newTransactionInfoData;
+    emit transactionInfoDataChanged();
 }
