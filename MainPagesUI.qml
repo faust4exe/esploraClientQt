@@ -24,25 +24,25 @@ ColumnLayout {
         Layout.fillWidth: true
 
         Button {
-            text: "Blocks List"
+            text: "Blocks"
             visible: stackView.currentItem != page1
             onClicked: stackView.replace(page1)
         }
 
         Button {
-            text: "Block Details"
+            text: "Block Info"
             visible: stackView.currentItem != page2
             onClicked: stackView.replace(page2)
         }
 
         Button {
-            text: "Transactions List"
+            text: "Transactions"
             visible: stackView.currentItem != page3
             onClicked: stackView.replace(page3)
         }
 
         Button {
-            text: "Transaction Details"
+            text: "Transaction Info"
             visible: stackView.currentItem != page4
             onClicked: stackView.replace(page4)
         }

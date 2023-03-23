@@ -25,6 +25,7 @@ class EsploraFetcher : public QObject
     Q_PROPERTY(QString blockInfoData READ blockInfoData WRITE setBlockInfoData NOTIFY blockInfoDataChanged)
     Q_PROPERTY(int transactionsListSelectedIndex READ transactionsListSelectedIndex WRITE setTransactionsListSelectedIndex NOTIFY transactionsListSelectedIndexChanged)
     Q_PROPERTY(QString transactionInfoData READ transactionInfoData WRITE setTransactionInfoData NOTIFY transactionInfoDataChanged)
+    Q_PROPERTY(QString selectedTransactionId READ selectedTransactionId WRITE setSelectedTransactionId NOTIFY selectedTransactionIdChanged)
 
 public:
     enum RequestType {
@@ -73,6 +74,9 @@ public:
     QString transactionInfoData() const;
     void setTransactionInfoData(const QString &newTransactionInfoData);
 
+    QString selectedTransactionId() const;
+    void setSelectedTransactionId(const QString &newSelectedTransactionId);
+
 signals:
     void dataReady(const QString &data);
     void transactionDataReady(const QString &data);
@@ -96,6 +100,8 @@ signals:
 
     void transactionInfoDataChanged();
 
+    void selectedTransactionIdChanged();
+
 private slots:
     void onReplyFinished();
     void onErrorOccured();
@@ -108,6 +114,7 @@ private:
     QJsonDocument parseDocument(const QByteArray &array) const;
     void updateBlocksList();
     void updateTransactionsList();
+    void updateSelectedTransactionId();
 
 private:
     void getRequest(const QString &adress, RequestType type = Undefined);
@@ -133,6 +140,7 @@ private:
     QString m_blockInfoData = "";
     int m_transactionsListSelectedIndex = -1;
     QString m_transactionInfoData = "";
+    QString m_selectedTransactionId = "";
 };
 
 #endif // ESPLORAFETCHER_H

@@ -280,6 +280,19 @@ void EsploraFetcher::updateTransactionsList()
     emit transactionsListChanged();
 }
 
+void EsploraFetcher::updateSelectedTransactionId()
+{
+    if(m_transactionsListSelectedIndex < 0
+            || m_transactionsListSelectedIndex >= m_transactionsList.count()){
+        return;
+    }
+
+    const QVariantMap data = m_transactionsList.at(m_transactionsListSelectedIndex).toMap();
+    const QString selectedTxId = data.value("txId").toString();
+    setSelectedTransactionId(selectedTxId);
+    getTransactionInfo(selectedTxId);
+}
+
 void EsploraFetcher::getRequest(const QString &adress, RequestType type)
 {
     QNetworkRequest request;
@@ -410,6 +423,8 @@ void EsploraFetcher::setTransactionsListSelectedIndex(int newTransactionsListSel
 
     m_transactionsListSelectedIndex = newTransactionsListSelectedIndex;
     emit transactionsListSelectedIndexChanged();
+
+    updateSelectedTransactionId();
 }
 
 QString EsploraFetcher::transactionInfoData() const
@@ -425,4 +440,19 @@ void EsploraFetcher::setTransactionInfoData(const QString &newTransactionInfoDat
 
     m_transactionInfoData = newTransactionInfoData;
     emit transactionInfoDataChanged();
+}
+
+QString EsploraFetcher::selectedTransactionId() const
+{
+    return m_selectedTransactionId;
+}
+
+void EsploraFetcher::setSelectedTransactionId(const QString &newSelectedTransactionId)
+{
+    if (m_selectedTransactionId == newSelectedTransactionId) {
+        return;
+    }
+
+    m_selectedTransactionId = newSelectedTransactionId;
+    emit selectedTransactionIdChanged();
 }

@@ -51,18 +51,6 @@ GroupBox {
     AnimatedListView {
         id: transactionsListView
 
-        property string selectedTxId: ""
-        property int pressedIndex: esploraFetcher.transactionsListSelectedIndex
-
-        onPressedIndexChanged: {
-            if(pressedIndex < 0){
-                return
-            }
-
-            selectedTxId = transactionsListView.itemAtIndex(pressedIndex).txId
-            esploraFetcher.getTransactionInfo(selectedTxId)
-        }
-
         Label {
             anchors.centerIn: parent
             opacity: 0.5
@@ -77,7 +65,7 @@ GroupBox {
         delegate: ListViewDelegate {
             property string txId: modelData.txId
 
-            isSelected: txId === transactionsListView.selectedTxId
+            isSelected: txId === esploraFetcher.selectedTransactionId
 
             width: transactionsListView.width - 20
 
